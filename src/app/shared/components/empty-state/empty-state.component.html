@@ -1,0 +1,13 @@
+<div class="empty-state">
+  <div class="empty-state-content">
+    <div *ngIf="icon" class="empty-state-icon">
+      <i [class]="icon"></i>
+    </div>
+    <h3 class="empty-state-message">{{ message }}</h3>
+    <button *ngIf="actionText" 
+            class="btn btn-primary empty-state-action" 
+            (click)="actionCallback()">
+      {{ actionText }}
+    </button>
+  </div>
+</div>
