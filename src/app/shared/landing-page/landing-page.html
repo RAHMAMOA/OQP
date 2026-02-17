@@ -1,0 +1,59 @@
+<!-- Header Navigation -->
+<header class="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-200">
+  <nav class="container mx-auto px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+        </svg>
+        <span class="text-2xl font-bold text-gray-900">QuizPortal</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button class="text-gray-600 hover:text-gray-900 transition-colors">Login</button>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+          Get Started
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-green-400 flex items-center justify-center pt-20">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col lg:flex-row items-center gap-12">
+      <!-- Left Content -->
+      <div class="flex-1 text-left">
+        <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+          Master Any Subject with
+          <span class="text-yellow-300"> Interactive Quizzes</span>
+        </h1>
+        <p class="text-xl text-white/90 mb-8 max-w-2xl">
+          A modern quiz platform designed for students and educators. Create quizzes, track progress, and test your knowledge — all in one place.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button class="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors">
+            Start Learning →
+          </button>
+          <button class="bg-transparent text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors border-2 border-white">
+            Sign in
+          </button>
+        </div>
+      </div>
+      
+      <!-- Right Content (placeholder for image/illustration) -->
+      <div class="flex-1 flex justify-center">
+        <div class="w-full max-w-md h-96 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30">
+          <div class="text-center">
+            <svg class="w-32 h-32 text-white mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+            </svg>
+            <p class="text-white font-semibold">Quiz Platform</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-why-quizportal></app-why-quizportal>
