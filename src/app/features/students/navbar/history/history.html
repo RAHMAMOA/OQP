@@ -1,1 +1,54 @@
-<p>history works!</p>
+<div class="min-h-screen  font-sans text-slate-800 ">
+    <div class="mx-auto max-w-7xl pb-10">
+        <!-- Main Content -->
+        <main class="px-6 mt-8">
+            <header class="mb-8">
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-3">Attempt History</h1>
+                <p class="text-lg text-slate-500">Review all your past quiz attempts below.</p>
+            </header>
+
+            <!-- Empty State -->
+            <div *ngIf="attempts.length === 0" class="flex flex-col items-center justify-center py-24 text-slate-400">
+                <svg viewBox="0 0 24 24" class="h-20 w-20 mb-6 fill-none stroke-current stroke-1 opacity-50">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <p class="text-2xl font-medium">No attempts yet</p>
+                <p class="text-lg mt-2">Take a quiz to see your history here.</p>
+            </div>
+
+            <!-- Attempt List -->
+            <div *ngIf="attempts.length > 0" class="flex flex-col gap-4">
+                <div *ngFor="let attempt of attempts; let i = index"
+                    class="flex items-center justify-between bg-white rounded-2xl px-10 py-8 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+
+                    <!-- Left: Icon + Info -->
+                    <div class="flex items-center gap-6">
+                        <!-- Colored dot indicator -->
+                        <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-50">
+                            <svg viewBox="0 0 24 24" class="h-7 w-7 fill-none stroke-emerald-500 stroke-2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <p class="font-semibold text-slate-900 text-lg">{{ attempt.quizName }}</p>
+                            <p class="text-sm text-slate-400 mt-1">{{ attempt.date }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Score Badge -->
+                    <div class="flex items-center gap-4">
+                        <span class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-lg font-bold"
+                            [ngClass]="getScoreClass(attempt.score)">
+                            <span class="inline-block h-3 w-3 rounded-full"
+                                [ngClass]="getScoreDotClass(attempt.score)"></span>
+                            {{ attempt.score }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

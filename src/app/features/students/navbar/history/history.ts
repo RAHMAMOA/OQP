@@ -1,11 +1,60 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../../core/services/auth.service';
+import { AttemptService } from '../../../../core/services/attempet.service';
+import { Attempt } from '../../../../core/models/attempet';
 
 @Component({
   selector: 'app-history',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './history.html',
   styleUrl: './history.css',
 })
 export class History {
+  brandName = 'OQP';
+  user = { name: '', role: 'student' };
+  attempts: Attempt[] = [];
 
+  constructor(
+    private router: Router,
+    private attemptService: AttemptService,
+    private authService: AuthService
+  ) { }
+
+  ngOnInit(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.user.name = currentUser.username;
+      this.attempts = this.attemptService.getAttemptsForUser(currentUser.username);
+    }
+    // Seed demo data if none exist (for display purposes)
+    if (this.attempts.length === 0) {
+      this.attempts = [
+        { quizName: 'Nour Quiz', user: this.user.name, date: '2/1 mistake', score: '0%', status: 'Completed' },
+        { quizName: 'Nour Quiz', user: this.user.name, date: '2/1 mistake', score: '0%', status: 'Completed' },
+        { quizName: 'Angular Basics', user: this.user.name, date: '2/1 mistake', score: '100%', status: 'Completed' },
+        { quizName: 'Angular Basics', user: this.user.name, date: '2/1 mistake', score: '40%', status: 'Completed' },
+      ];
+    }
+  }
+
+  getScoreClass(score: string): string {
+    const val = parseInt(score);
+    if (val >= 80) return 'bg-emerald-100 text-emerald-700';
+    if (val >= 40) return 'bg-amber-100 text-amber-700';
+    return 'bg-red-100 text-red-600';
+  }
+
+  getScoreDotClass(score: string): string {
+    const val = parseInt(score);
+    if (val >= 80) return 'bg-emerald-500';
+    if (val >= 40) return 'bg-amber-400';
+    return 'bg-red-500';
+  }
+
+  onLogout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

@@ -12,11 +12,12 @@ import { Settings as AdminSettingsComponent } from './features/admin/settings/se
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { studentGuard } from './core/guards/student.guard';
+import { GuestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
-    { path: 'login', component: LoginComponent },
-    { path: 'register', component: RegisterComponent },
+    { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
+    { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
     {
         path: 'admin',
         canActivate: [authGuard, adminGuard],
