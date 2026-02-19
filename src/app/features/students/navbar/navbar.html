@@ -1,0 +1,58 @@
+<nav class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+    <!-- Logo and Brand -->
+    <div class="flex items-center gap-2">
+      <div class="flex items-center justify-center w-10 h-10 bg-emerald-500 rounded-lg">
+        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6.5 2H20v22H6.5A2.5 2.5 0 0 1 4 21.5v-17A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="text-xl font-semibold text-gray-800">QuizPortal</span>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex gap-4">
+      <a 
+        routerLink="/dashboard" 
+        routerLinkActive="active" 
+        class="px-4 py-2 rounded-lg text-gray-600 font-medium transition-all duration-200 cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+        [class.bg-green-100]="isActive('/dashboard')"
+        [class.text-green-800]="isActive('/dashboard')"
+      >
+        Dashboard
+      </a>
+      <a 
+        routerLink="/history" 
+        routerLinkActive="active" 
+        class="px-4 py-2 rounded-lg text-gray-600 font-medium transition-all duration-200 cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+        [class.bg-green-100]="isActive('/history')"
+        [class.text-green-800]="isActive('/history')"
+      >
+        History
+      </a>
+      <a 
+        routerLink="/profile" 
+        routerLinkActive="active" 
+        class="px-4 py-2 rounded-lg text-gray-600 font-medium transition-all duration-200 cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+        [class.bg-green-100]="isActive('/profile')"
+        [class.text-green-800]="isActive('/profile')"
+      >
+        Profile
+      </a>
+    </div>
+
+    <!-- User Info and Logout -->
+    <div class="flex items-center gap-4">
+      <div class="flex items-center">
+        <span class="text-sm font-medium text-gray-700">{{ currentUser?.username }} student</span>
+      </div>
+      <button 
+        class="px-4 py-2 bg-red-500 text-white border-none rounded-md text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-red-600"
+        (click)="logout()"
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>

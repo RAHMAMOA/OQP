@@ -4,6 +4,8 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { DashboardComponent as AdminDashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { DashboardComponent as StudentDashboardComponent } from './features/students/dashboard/dashboard.component';
+import { History } from './features/students/history/history';
+import { Profile } from './features/students/profile/profile';
 import { ManageQuizzesComponent } from './features/admin/manage-quizzes/manage-quizzes.component';
 import { Students as AdminStudentsComponent } from './features/admin/students/students';
 import { Settings as AdminSettingsComponent } from './features/admin/settings/settings';
@@ -29,6 +31,16 @@ export const routes: Routes = [
     {
         path: 'dashboard',
         component: StudentDashboardComponent,
+        canActivate: [authGuard, studentGuard]
+    },
+    {
+        path: 'history',
+        component: History,
+        canActivate: [authGuard, studentGuard]
+    },
+    {
+        path: 'profile',
+        component: Profile,
         canActivate: [authGuard, studentGuard]
     },
     { path: '**', redirectTo: '' }
