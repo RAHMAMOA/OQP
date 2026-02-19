@@ -1,1 +1,22 @@
-<p>dashboard works!</p>
+<div class="p-8 max-w-7xl mx-auto space-y-14">
+  <!-- Header -->
+  <header>
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Admin Dashboard</h1>
+    <p class="text-gray-500 mt-1 font-medium">Overview of your quiz portal</p>
+  </header>
+
+  <!-- Stats Grid -->
+  <section>
+    <app-stats-cards [stats]="stats"></app-stats-cards>
+  </section>
+
+  <!-- Quick Actions -->
+  <section>
+    <app-quick-actions [actions]="quickActions"></app-quick-actions>
+  </section>
+
+  <!-- Recent Attempts -->
+  <section>
+    <app-recent-attempts [attempts]="recentAttempts"></app-recent-attempts>
+  </section>
+</div>
