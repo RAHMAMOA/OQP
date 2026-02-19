@@ -2,6 +2,12 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
+import { QuizService } from '../../../core/services/quiz.service';
+import { AttemptService } from '../../../core/services/attempet.service';
+import { SettingsService } from '../../../core/services/settings.service';
+import { Quiz } from '../../../core/models/quiz';
+import { Observable } from 'rxjs';
+import { map, combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,38 +22,48 @@ export class DashboardComponent {
     name: '',
     role: 'student'
   };
+  quizzes$: Observable<Quiz[]>;
+  stats$: Observable<any[]>;
+  welcomeMessage = '';
 
-  quizzes = [
-    {
-      title: 'Angular Basics',
-      description: 'Test your knowledge of Angular fundamentals including components, directives, and services.',
-      questions: 5,
-      time: '10m',
-      bestScore: '100%',
-      status: 'Completed'
-    },
-    {
-      title: 'TypeScript Fundamentals',
-      description: 'Evaluate your understanding of TypeScript types, interfaces, and advanced features.',
-      questions: 3,
-      time: '15m',
-      bestScore: '0%',
-      status: 'Completed'
-    }
-  ];
+  constructor(private router: Router, private authService: AuthService, private quizService: QuizService, private attemptService: AttemptService, private settingsService: SettingsService) {
+    this.quizzes$ = this.quizService.getQuizzes();
+    this.stats$ = this.calculateStats();
+    this.welcomeMessage = this.settingsService.getSettings().welcomeMessage;
+  }
 
-  stats = [
-    { label: 'Available Quizzes', value: 3, icon: 'book' },
-    { label: 'Quizzes Taken', value: 11, icon: 'history' },
-    { label: 'Avg Score', value: '13%', icon: 'trending-up' }
-  ];
+  calculateStats(): Observable<any[]> {
+    return combineLatest([
+      this.quizzes$,
+      this.quizzes$.pipe(
+        map(quizzes => {
+          const currentUser = this.authService.getCurrentUser();
+          if (!currentUser) return [];
+          return this.attemptService.getAttemptsForUser(currentUser.username);
+        })
+      )
+    ]).pipe(
+      map(([quizzes, attempts]) => {
+        const quizzesTaken = attempts.length;
+        const totalScore = attempts.reduce((sum, attempt) => {
+          const score = parseInt(attempt.score.replace('%', ''));
+          return sum + score;
+        }, 0);
+        const avgScore = quizzesTaken > 0 ? Math.round(totalScore / quizzesTaken) : 0;
 
-  constructor(private router: Router, private authService: AuthService) { }
+        return [
+          { label: 'Available Quizzes', value: quizzes.length, icon: 'book' },
+          { label: 'Quizzes Taken', value: quizzesTaken, icon: 'history' },
+          { label: 'Avg Score', value: `${avgScore}%`, icon: 'trending-up' }
+        ];
+      })
+    );
+  }
 
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
-      this.user.name = currentUser.username;
+      this.user.name = currentUser.fullName || currentUser.username;
     }
   }
 

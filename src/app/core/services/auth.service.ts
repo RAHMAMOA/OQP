@@ -47,4 +47,11 @@ export class AuthService {
     getCurrentUser(): User | null {
         return this.currentUserSubject.value;
     }
+
+    updateProfile(updatedUser: User): void {
+        const { password, ...userWithoutPassword } = updatedUser;
+        localStorage.setItem(this.SESSION_KEY, JSON.stringify(userWithoutPassword));
+        this.currentUserSubject.next(userWithoutPassword as User);
+        this.userService.updateUser(updatedUser);
+    }
 }

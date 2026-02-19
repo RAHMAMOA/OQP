@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
+import { SettingsService } from '../../../core/services/settings.service';
 import { User } from '../../../core/models/user';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -16,14 +17,17 @@ export class Navbar implements OnInit, OnDestroy {
   currentUser: User | null = null;
   currentUser$: Observable<User | null>;
   showNavbar$: Observable<User | null>;
+  brandName = '';
   private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private settingsService: SettingsService
   ) {
     this.currentUser$ = this.authService.currentUser$;
     this.showNavbar$ = this.authService.currentUser$;
+    this.brandName = this.settingsService.getSettings().siteName;
   }
 
   ngOnInit(): void {

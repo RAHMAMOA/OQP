@@ -16,12 +16,21 @@ export class UserService {
             users.push({
                 id: 'admin-1',
                 username: 'admin',
+                fullName: 'Administrator',
                 email: 'admin@oqp.com',
                 password: 'admin123',
                 role: 'admin'
             });
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(users));
         }
+
+        // Fix existing users without passwords
+        users.forEach(user => {
+            if (!user.password && user.email === 'r44234782@gmail.com') {
+                user.password = 'rah123';
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(users));
+            }
+        });
 
         return users;
     }
@@ -35,5 +44,15 @@ export class UserService {
     emailExists(email: string): boolean {
         const users = this.getUsers();
         return users.some(u => u.email.toLowerCase() === email.toLowerCase());
+    }
+
+    updateUser(updatedUser: User): void {
+        const users = this.getUsers();
+        const userIndex = users.findIndex(u => u.id === updatedUser.id);
+
+        if (userIndex !== -1) {
+            users[userIndex] = updatedUser;
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(users));
+        }
     }
 }

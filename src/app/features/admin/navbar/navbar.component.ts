@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { SettingsService } from '../../../core/services/settings.service';
 import { Observable, filter, map, startWith } from 'rxjs';
 import { User } from '../../../core/models/user';
 
@@ -15,12 +16,15 @@ import { User } from '../../../core/models/user';
 export class NavbarComponent {
     currentUser$: Observable<User | null>;
     showNavbar$: Observable<boolean>;
+    brandName = '';
 
     constructor(
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private settingsService: SettingsService
     ) {
         this.currentUser$ = this.authService.currentUser$;
+        this.brandName = this.settingsService.getSettings().siteName;
 
         // Hide navbar on public pages
         this.showNavbar$ = this.router.events.pipe(

@@ -28,15 +28,6 @@ export class History {
       this.user.name = currentUser.username;
       this.attempts = this.attemptService.getAttemptsForUser(currentUser.username);
     }
-    // Seed demo data if none exist (for display purposes)
-    if (this.attempts.length === 0) {
-      this.attempts = [
-        { quizName: 'Nour Quiz', user: this.user.name, date: '2/1 mistake', score: '0%', status: 'Completed' },
-        { quizName: 'Nour Quiz', user: this.user.name, date: '2/1 mistake', score: '0%', status: 'Completed' },
-        { quizName: 'Angular Basics', user: this.user.name, date: '2/1 mistake', score: '100%', status: 'Completed' },
-        { quizName: 'Angular Basics', user: this.user.name, date: '2/1 mistake', score: '40%', status: 'Completed' },
-      ];
-    }
   }
 
   getScoreClass(score: string): string {
