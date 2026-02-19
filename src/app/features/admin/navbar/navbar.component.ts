@@ -6,7 +6,7 @@ import { Observable, filter, map, startWith } from 'rxjs';
 import { User } from '../../../core/models/user';
 
 @Component({
-    selector: 'app-navbar',
+    selector: 'app-admin-navbar',
     standalone: true,
     imports: [CommonModule, RouterLink, RouterLinkActive],
     templateUrl: './navbar.component.html',

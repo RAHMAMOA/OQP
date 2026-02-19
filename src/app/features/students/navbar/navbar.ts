@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models/user';
 import { Observable, Subject } from 'rxjs';
@@ -7,18 +8,23 @@ import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit, OnDestroy {
   currentUser: User | null = null;
+  currentUser$: Observable<User | null>;
+  showNavbar$: Observable<User | null>;
   private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
     private router: Router
-  ) { }
+  ) {
+    this.currentUser$ = this.authService.currentUser$;
+    this.showNavbar$ = this.authService.currentUser$;
+  }
 
   ngOnInit(): void {
     this.authService.currentUser$

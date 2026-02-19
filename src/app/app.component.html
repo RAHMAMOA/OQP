@@ -1,2 +1,5 @@
-<app-navbar></app-navbar>
+<ng-container *ngIf="currentUser$ | async as user">
+  <app-navbar *ngIf="user.role === 'student'"></app-navbar>
+  <app-admin-navbar *ngIf="user.role === 'admin'"></app-admin-navbar>
+</ng-container>
 <router-outlet></router-outlet>
