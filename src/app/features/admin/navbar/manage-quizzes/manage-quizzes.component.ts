@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Quiz } from '../../../core/models/quiz';
 import { RouterLink } from '@angular/router';
-import { QuizService } from '../../../core/services/quiz.service';
+import { QuizService } from '../../../../core/services/quiz.service';
 
 @Component({
   selector: 'app-manage-quizzes',

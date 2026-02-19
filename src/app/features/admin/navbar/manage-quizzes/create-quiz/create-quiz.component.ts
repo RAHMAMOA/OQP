@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
-import { Question, QuestionType } from '../../../../core/models/question';
+import { Question, QuestionType } from '../../../../../core/models/question';
+import { QuizService } from '../../../../../core/services/quiz.service';
 
-import { QuizService } from '../../../../core/services/quiz.service';
 
 @Component({
     selector: 'app-create-quiz',
