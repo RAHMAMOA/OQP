@@ -6,8 +6,8 @@ import { DashboardComponent as AdminDashboardComponent } from './features/admin/
 import { DashboardComponent as StudentDashboardComponent } from './features/students/dashboard/dashboard.component';
 import { History } from './features/students/navbar/history/history';
 import { Profile } from './features/students/navbar/profile/profile';
-import { ManageQuizzesComponent } from './features/admin/manage-quizzes/manage-quizzes.component';
-import { Students as AdminStudentsComponent } from './features/admin/navbar/students/students';
+import { ManageQuizzesComponent } from './features/admin/navbar/manage-quizzes/manage-quizzes.component';
+import { Students as AdminStudentsComponent } from './features/admin/students/students';
 import { SettingsComponent as AdminSettingsComponent } from './features/admin/navbar/settings/settings.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
@@ -24,7 +24,7 @@ export const routes: Routes = [
         children: [
             { path: '', component: AdminDashboardComponent },
             { path: 'quizzes', component: ManageQuizzesComponent },
-            { path: 'quizzes/create', loadComponent: () => import('./features/admin/manage-quizzes/create-quiz/create-quiz.component').then(m => m.CreateQuizComponent) },
+            { path: 'quizzes/create', loadComponent: () => import('./features/admin/navbar/manage-quizzes/create-quiz/create-quiz.component').then(m => m.CreateQuizComponent) },
             { path: 'students', component: AdminStudentsComponent },
             { path: 'settings', component: AdminSettingsComponent }
         ]
