@@ -1,0 +1,140 @@
+<div class="min-h-screen bg-gray-50 font-['Inter',-apple-system,sans-serif]">
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <button (click)="goToDashboard()" class="text-gray-500 hover:text-gray-900 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <h1 class="text-xl font-bold text-gray-900">Quiz Results</h1>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-6 py-8">
+    <!-- Result Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
+      <div class="text-center">
+        <!-- Status Icon -->
+        <div class="mb-6">
+          <div *ngIf="!passed" class="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full">
+            <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </div>
+          <div *ngIf="passed" class="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full">
+            <svg class="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Result Message -->
+        <h2 *ngIf="!passed" class="text-3xl font-bold text-red-600 mb-2">Better Luck Next Time</h2>
+        <h2 *ngIf="passed" class="text-3xl font-bold text-emerald-600 mb-2">Congratulations!</h2>
+        
+        <p class="text-gray-500 text-lg mb-8">{{ quizName || 'Quiz' }}</p>
+
+        <!-- Score Summary -->
+        <div class="grid grid-cols-3 gap-6 mb-8">
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="text-3xl font-bold text-gray-900">{{ score }}%</div>
+            <div class="text-sm text-gray-500">Score</div>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="text-3xl font-bold text-gray-900">{{ correct }}</div>
+            <div class="text-sm text-gray-500">Correct</div>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="text-3xl font-bold text-gray-900">{{ wrong }}</div>
+            <div class="text-sm text-gray-500">Wrong</div>
+          </div>
+        </div>
+
+        <!-- Passing Score Reference -->
+        <div class="flex justify-center space-x-8 mb-8">
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 bg-emerald-500 rounded"></div>
+            <span class="text-gray-700 font-medium">{{ correct }} Correct</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 bg-red-500 rounded"></div>
+            <span class="text-gray-700 font-medium">{{ wrong }} Wrong</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-4">
+          <button (click)="reviewAnswers()" 
+                  [disabled]="!attempt || !attempt.selectedAnswers"
+                  class="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Review Answers
+          </button>
+          <button (click)="goToHistory()" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+            View History
+          </button>
+          <button (click)="goToDashboard()" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attempt Details -->
+    <div *ngIf="attempt" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">Attempt Details</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <h4 class="font-semibold text-gray-700 mb-2">Quiz Information</h4>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Quiz Name:</span>
+              <span class="font-medium">{{ attempt.quizName }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Status:</span>
+              <span class="font-medium" [class]="passed ? 'text-emerald-600' : 'text-red-600'">
+                {{ attempt.status }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Completed:</span>
+              <span class="font-medium">{{ formatDate(attempt.date) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-gray-700 mb-2">Performance</h4>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Percentage:</span>
+              <span class="font-medium">{{ score }}%</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Passing Score:</span>
+              <span class="font-medium">50%</span>
+            </div>
+            <div *ngIf="attempt.totalQuestions" class="flex justify-between">
+              <span class="text-gray-500">Total Questions:</span>
+              <span class="font-medium">{{ attempt.totalQuestions }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review Answers Section -->
+      <div *ngIf="attempt.selectedAnswers" class="mt-6">
+        <h4 class="font-semibold text-gray-700 mb-4">Answer Review</h4>
+        <div class="text-center text-gray-500 py-4">
+          <p>Detailed answer review functionality would be implemented here.</p>
+          <p class="text-sm">You answered {{ Object.keys(attempt.selectedAnswers).length }} questions.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

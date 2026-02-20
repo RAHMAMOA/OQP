@@ -1,10 +1,10 @@
-<div class="min-h-screen  font-sans text-slate-800 ">
+<div class="min-h-screen font-sans text-slate-800">
     <div class="mx-auto max-w-7xl pb-10">
         <!-- Main Content -->
         <main class="px-6 mt-8">
             <header class="mb-8">
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-3">Attempt History</h1>
-                <p class="text-lg text-slate-500">Review all your past quiz attempts below.</p>
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-3">Quiz History</h1>
+                <p class="text-lg text-slate-500">Review all your past quiz attempts and detailed performance.</p>
             </header>
 
             <!-- Empty State -->
@@ -13,39 +13,88 @@
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <p class="text-2xl font-medium">No attempts yet</p>
+                <p class="text-2xl font-medium">No quiz attempts yet</p>
                 <p class="text-lg mt-2">Take a quiz to see your history here.</p>
             </div>
 
             <!-- Attempt List -->
-            <div *ngIf="attempts.length > 0" class="flex flex-col gap-4">
+            <div *ngIf="attempts.length > 0" class="space-y-4">
                 <div *ngFor="let attempt of attempts; let i = index"
-                    class="flex items-center justify-between bg-white rounded-2xl px-10 py-8 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                    class="bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200">
 
-                    <!-- Left: Icon + Info -->
-                    <div class="flex items-center gap-6">
-                        <!-- Colored dot indicator -->
-                        <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-50">
-                            <svg viewBox="0 0 24 24" class="h-7 w-7 fill-none stroke-emerald-500 stroke-2">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                            </svg>
+                    <!-- Header Row -->
+                    <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                        <div class="flex items-center gap-4">
+                            <!-- Status Icon -->
+                            <div class="flex h-12 w-12 items-center justify-center rounded-xl"
+                                 [ngClass]="attempt.status === 'Passed' ? 'bg-emerald-50' : 'bg-red-50'">
+                                <svg *ngIf="attempt.status === 'Passed'" viewBox="0 0 24 24" class="h-6 w-6 text-emerald-500" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <svg *ngIf="attempt.status === 'Failed'" viewBox="0 0 24 24" class="h-6 w-6 text-red-500" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-lg">{{ attempt.quizName }}</h3>
+                                <p class="text-sm text-slate-500">{{ formatDate(attempt.date) }}</p>
+                            </div>
                         </div>
 
-                        <div>
-                            <p class="font-semibold text-slate-900 text-lg">{{ attempt.quizName }}</p>
-                            <p class="text-sm text-slate-400 mt-1">{{ attempt.date }}</p>
-                        </div>
+                        <!-- Status Badge -->
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold"
+                              [ngClass]="getStatusClass(attempt.status)">
+                            {{ attempt.status }}
+                        </span>
                     </div>
 
-                    <!-- Right: Score Badge -->
-                    <div class="flex items-center gap-4">
-                        <span class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-lg font-bold"
-                            [ngClass]="getScoreClass(attempt.score)">
-                            <span class="inline-block h-3 w-3 rounded-full"
-                                [ngClass]="getScoreDotClass(attempt.score)"></span>
-                            {{ attempt.score }}
-                        </span>
+                    <!-- Details Row -->
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <!-- Score -->
+                            <div class="text-center p-4 bg-slate-50 rounded-xl">
+                                <div class="text-2xl font-bold text-slate-900">{{ attempt.score }}%</div>
+                                <div class="text-sm text-slate-500">Score</div>
+                            </div>
+                            
+                            <!-- Correct Answers -->
+                            <div class="text-center p-4 bg-emerald-50 rounded-xl">
+                                <div class="text-2xl font-bold text-emerald-600">{{ attempt.correctAnswers || 0 }}</div>
+                                <div class="text-sm text-slate-500">Correct</div>
+                            </div>
+                            
+                            <!-- Wrong Answers -->
+                            <div class="text-center p-4 bg-red-50 rounded-xl">
+                                <div class="text-2xl font-bold text-red-600">{{ attempt.wrongAnswers || 0 }}</div>
+                                <div class="text-sm text-slate-500">Wrong</div>
+                            </div>
+                            
+                            <!-- Total Questions -->
+                            <div class="text-center p-4 bg-blue-50 rounded-xl">
+                                <div class="text-2xl font-bold text-blue-600">{{ attempt.totalQuestions || 0 }}</div>
+                                <div class="text-sm text-slate-500">Total</div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3">
+                            <button *ngIf="attempt.selectedAnswers" 
+                                    class="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg font-semibold hover:bg-emerald-600 transition-colors">
+                                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Review Answers
+                            </button>
+                            
+                            <button routerLink="/quiz/{{ attempt.quizId }}" 
+                                    class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-colors">
+                                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Retake Quiz
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

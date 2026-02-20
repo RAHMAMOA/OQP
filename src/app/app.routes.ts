@@ -25,6 +25,7 @@ export const routes: Routes = [
             { path: '', component: AdminDashboardComponent },
             { path: 'quizzes', component: ManageQuizzesComponent },
             { path: 'quizzes/create', loadComponent: () => import('./features/admin/navbar/manage-quizzes/create-quiz/create-quiz.component').then(m => m.CreateQuizComponent) },
+            { path: 'quizzes/edit/:id', loadComponent: () => import('./features/admin/navbar/manage-quizzes/edit-quiz/edit-quiz.component').then(m => m.EditQuizComponent) },
             { path: 'students', component: AdminStudentsComponent },
             { path: 'settings', component: AdminSettingsComponent }
         ]
@@ -32,6 +33,16 @@ export const routes: Routes = [
     {
         path: 'dashboard',
         component: StudentDashboardComponent,
+        canActivate: [authGuard, studentGuard]
+    },
+    {
+        path: 'quiz/:id',
+        loadComponent: () => import('./features/students/quiz-attempt/quiz-attempt.component').then(m => m.QuizAttemptComponent),
+        canActivate: [authGuard, studentGuard]
+    },
+    {
+        path: 'quiz-result/:id',
+        loadComponent: () => import('./features/students/quiz-result/quiz-result.component').then(m => m.QuizResultComponent),
         canActivate: [authGuard, studentGuard]
     },
     {
