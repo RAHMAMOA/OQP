@@ -13,12 +13,12 @@
         <div>
           <h3 class="font-bold text-gray-900">{{ attempt.quizName }}</h3>
           <p class="text-xs text-gray-500 font-medium tracking-tight">
-            {{ attempt.user }} • {{ attempt.date }}
+            {{ getStudentName(attempt.user) }} • {{ formatDate(attempt.date) }}
           </p>
         </div>
       </div>
       <div class="flex items-center space-x-3">
-        <span class="px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-red-50 text-red-600 border border-red-100">
+        <span [class]="getStatusClass(attempt.status)" class="px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest">
           {{ attempt.score }} X
         </span>
       </div>

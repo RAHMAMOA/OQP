@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PlatformSettings } from '../models/settings';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class SettingsService {
     allowRetakes: false,
     showCorrectAnswers: false
   };
+  private settingsSubject = new BehaviorSubject<PlatformSettings>(this.defaultSettings);
 
   constructor() {
     this.initializeDefaultSettings();
@@ -21,9 +23,15 @@ export class SettingsService {
 
   private initializeDefaultSettings() {
     const stored = localStorage.getItem(this.STORAGE_KEY);
+    const settings = stored ? { ...this.defaultSettings, ...JSON.parse(stored) } : this.defaultSettings;
+    this.settingsSubject.next(settings);
     if (!stored) {
       this.saveSettings(this.defaultSettings);
     }
+  }
+
+  getSettings$(): Observable<PlatformSettings> {
+    return this.settingsSubject.asObservable();
   }
 
   getSettings(): PlatformSettings {
@@ -35,6 +43,7 @@ export class SettingsService {
     const currentSettings = this.getSettings();
     const updatedSettings = { ...currentSettings, ...settings };
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedSettings));
+    this.settingsSubject.next(updatedSettings);
   }
 
   updateSiteName(siteName: string): void {

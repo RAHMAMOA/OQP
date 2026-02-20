@@ -15,7 +15,6 @@ export class Students implements OnInit {
     quizzesTaken: number;
     avgScore: number;
     passRate: number;
-    joined: string;
   }[] = [];
 
   constructor(
@@ -47,17 +46,23 @@ export class Students implements OnInit {
     const users = this.userService.getUsers();
     const students = users.filter((user: any) => user.role === 'student');
 
+    console.log('All users:', users);
+    console.log('Filtered students:', students);
+
     this.students = students.map((student: any) => {
       const stats = this.attemptService.getUserStats(student.username);
+      console.log(`Stats for ${student.username}:`, stats);
+
       return {
         username: student.username,
         email: student.email,
         quizzesTaken: stats.quizzesTaken,
         avgScore: stats.avgScore,
-        passRate: stats.passRate,
-        joined: 'Recently' // You might want to add a createdAt field to User model
+        passRate: stats.passRate
       };
     });
+
+    console.log('Final students data:', this.students);
   }
 
   viewStudentDetails(student: any): void {

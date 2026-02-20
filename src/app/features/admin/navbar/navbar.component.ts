@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SettingsService } from '../../../core/services/settings.service';
-import { Observable, filter, map, startWith } from 'rxjs';
+import { Observable, filter, map, startWith, Subject, takeUntil } from 'rxjs';
 import { User } from '../../../core/models/user';
 
 @Component({
@@ -13,10 +13,11 @@ import { User } from '../../../core/models/user';
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.css'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
     currentUser$: Observable<User | null>;
     showNavbar$: Observable<boolean>;
     brandName = '';
+    private destroy$ = new Subject<void>();
 
     constructor(
         private authService: AuthService,
@@ -24,7 +25,6 @@ export class NavbarComponent {
         private settingsService: SettingsService
     ) {
         this.currentUser$ = this.authService.currentUser$;
-        this.brandName = this.settingsService.getSettings().siteName;
 
         // Hide navbar on public pages
         this.showNavbar$ = this.router.events.pipe(
@@ -35,6 +35,19 @@ export class NavbarComponent {
                 return !(url === '/' || url === '/login' || url === '/register');
             })
         );
+    }
+
+    ngOnInit(): void {
+        this.settingsService.getSettings$()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(settings => {
+                this.brandName = settings.siteName;
+            });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     logout() {

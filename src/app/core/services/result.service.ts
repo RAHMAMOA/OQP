@@ -12,6 +12,11 @@ export class AttemptService {
 
     constructor() {
         this.loadFromLocalStorage();
+
+        // Add global function for clearing attempts (for testing)
+        (window as any).clearAllAttempts = () => {
+            this.clearAllAttempts();
+        };
     }
 
     private loadFromLocalStorage() {
@@ -45,8 +50,18 @@ export class AttemptService {
         return this.attemptsSubject.value.filter(attempt => attempt.user === username);
     }
 
+    clearAllAttempts(): void {
+        this.attemptsSubject.next([]);
+        localStorage.removeItem(this.storageKey);
+        console.log('All attempts cleared from localStorage');
+    }
+
     getUserStats(username: string): { quizzesTaken: number; avgScore: number; passRate: number } {
         const userAttempts = this.getAttemptsByUser(username);
+
+        console.log(`getUserStats for ${username}:`);
+        console.log('All attempts:', this.attemptsSubject.value);
+        console.log('User attempts:', userAttempts);
 
         if (userAttempts.length === 0) {
             return { quizzesTaken: 0, avgScore: 0, passRate: 0 };
@@ -58,10 +73,13 @@ export class AttemptService {
         const passCount = scores.filter(score => score >= 50).length;
         const passRate = Math.round((passCount / scores.length) * 100);
 
-        return {
+        const result = {
             quizzesTaken: userAttempts.length,
             avgScore,
             passRate
         };
+
+        console.log('Calculated stats:', result);
+        return result;
     }
 }

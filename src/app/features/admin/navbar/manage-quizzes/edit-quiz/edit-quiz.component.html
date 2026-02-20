@@ -48,28 +48,21 @@
         <!-- Dropdown Menu -->
         <div *ngIf="isDropdownOpen" 
              class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-10 animate-fade-in-down">
-          <button (click)="addQuestion('mcq')" class="w-full text-left px-4 py-3 hover:bg-emerald-50 transition-colors flex items-center space-x-3">
-            <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
-            </div>
-            <div>
-              <div class="font-semibold text-gray-900">Multiple Choice</div>
-              <div class="text-xs text-gray-500">Question with multiple options</div>
-            </div>
+          <button (click)="addQuestion('mcq')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Multiple Choice</span>
           </button>
-          
-          <button (click)="addQuestion('true-false')" class="w-full text-left px-4 py-3 hover:bg-emerald-50 transition-colors flex items-center space-x-3">
-            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div>
-              <div class="font-semibold text-gray-900">True/False</div>
-              <div class="text-xs text-gray-500">Binary choice question</div>
-            </div>
+          <button (click)="addQuestion('true-false')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            <span>True / False</span>
+          </button>
+          <button (click)="addQuestion('fill-blank')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            <span>Fill in the Blank</span>
+          </button>
+          <button (click)="addQuestion('essay')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+            <span>Essay</span>
           </button>
         </div>
       </div>

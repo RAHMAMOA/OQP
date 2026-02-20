@@ -39,8 +39,8 @@
         <div *ngIf="getCurrentQuestion()?.type === 'mcq'" class="space-y-3">
           <div *ngFor="let option of getCurrentQuestion()?.options; let i = index" 
                class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"
-               [class]="selectedAnswers[getCurrentQuestion()!.id] === option ? 'border-emerald-500 bg-emerald-50' : ''"
-               (click)="selectAnswer(getCurrentQuestion()!.id!, option)">
+               [class]="selectedAnswers[currentQuestionIndex] === i ? 'border-emerald-500 bg-emerald-50' : ''"
+               (click)="selectAnswer(currentQuestionIndex, i)">
             <span class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-gray-600 mr-4">
               {{ String.fromCharCode(65 + i) }}
             </span>
@@ -51,18 +51,18 @@
         <!-- True/False Options -->
         <div *ngIf="getCurrentQuestion()?.type === 'true-false'" class="space-y-3">
           <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"
-                 [class]="selectedAnswers[getCurrentQuestion()!.id] === true ? 'border-emerald-500 bg-emerald-50' : ''">
-            <input type="radio" [name]="'question-' + getCurrentQuestion()!.id" [value]="true" 
-                   (change)="selectAnswer(getCurrentQuestion()!.id!, true)" 
-                   [checked]="selectedAnswers[getCurrentQuestion()!.id] === true" class="mr-4">
+                 [class]="selectedAnswers[currentQuestionIndex] === true ? 'border-emerald-500 bg-emerald-50' : ''">
+            <input type="radio" [name]="'question-' + currentQuestionIndex" [value]="true" 
+                   (change)="selectAnswer(currentQuestionIndex, true)" 
+                   [checked]="selectedAnswers[currentQuestionIndex] === true" class="mr-4">
             <span class="text-gray-700 font-medium">True</span>
           </label>
           
           <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"
-                 [class]="selectedAnswers[getCurrentQuestion()!.id] === false ? 'border-emerald-500 bg-emerald-50' : ''">
-            <input type="radio" [name]="'question-' + getCurrentQuestion()!.id" [value]="false" 
-                   (change)="selectAnswer(getCurrentQuestion()!.id!, false)" 
-                   [checked]="selectedAnswers[getCurrentQuestion()!.id] === false" class="mr-4">
+                 [class]="selectedAnswers[currentQuestionIndex] === false ? 'border-emerald-500 bg-emerald-50' : ''">
+            <input type="radio" [name]="'question-' + currentQuestionIndex" [value]="false" 
+                   (change)="selectAnswer(currentQuestionIndex, false)" 
+                   [checked]="selectedAnswers[currentQuestionIndex] === false" class="mr-4">
             <span class="text-gray-700 font-medium">False</span>
           </label>
         </div>

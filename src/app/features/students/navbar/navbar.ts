@@ -27,7 +27,6 @@ export class Navbar implements OnInit, OnDestroy {
   ) {
     this.currentUser$ = this.authService.currentUser$;
     this.showNavbar$ = this.authService.currentUser$;
-    this.brandName = this.settingsService.getSettings().siteName;
   }
 
   ngOnInit(): void {
@@ -35,6 +34,12 @@ export class Navbar implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUser = user;
+      });
+
+    this.settingsService.getSettings$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(settings => {
+        this.brandName = settings.siteName;
       });
   }
 
