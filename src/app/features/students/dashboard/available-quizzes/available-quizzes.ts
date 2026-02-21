@@ -29,7 +29,7 @@ export class AvailableQuizzes {
 
     return this.attempts.some(attempt =>
       this.currentUser && (attempt.userId === this.currentUser.username || (attempt as any).user === this.currentUser.username) &&
-      (attempt as any).quizId === quizId
+      attempt.quizId === quizId
     );
   }
 

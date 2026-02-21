@@ -11,10 +11,10 @@ import { StorageService } from './storage.service';
 export class AnswerService {
     private currentAttemptSubject = new BehaviorSubject<QuizAttempt | null>(null);
     private attemptsSubject = new BehaviorSubject<QuizAttempt[]>([]);
-    
+
     currentAttempt$ = this.currentAttemptSubject.asObservable();
     attempts$ = this.attemptsSubject.asObservable();
-    
+
     private storageKey = 'quizAttempts';
     private currentAttemptKey = 'currentAttempt';
 
@@ -83,7 +83,7 @@ export class AnswerService {
         }
 
         const existingAnswerIndex = currentAttempt.answers.findIndex(a => a.questionId === question.id);
-        
+
         const answer: Answer = {
             id: Date.now().toString(),
             questionId: question.id,
@@ -123,11 +123,18 @@ export class AnswerService {
             case 'true-false':
                 return answer.selectedAnswer === question.correctAnswer;
             case 'fill-blank':
-                return answer.textAnswer?.toLowerCase().trim() === 
-                       (question.correctAnswer as string)?.toLowerCase().trim();
+                return answer.textAnswer?.toLowerCase().trim() ===
+                    (question.correctAnswer as string)?.toLowerCase().trim();
             case 'essay':
-                // Essay questions typically require manual grading
-                return false;
+                // Compare essay answer with admin's reference answer
+                if (!answer.textAnswer || !question.correctAnswer) return false;
+
+                // Simple text comparison - can be enhanced for more sophisticated matching
+                const userAnswer = answer.textAnswer.trim().toLowerCase();
+                const referenceAnswer = (question.correctAnswer as string).trim().toLowerCase();
+
+                // Exact match for now - could add fuzzy matching later
+                return userAnswer === referenceAnswer;
             default:
                 return false;
         }
@@ -163,7 +170,7 @@ export class AnswerService {
 
     getAttemptsForQuiz(quizId: string): Observable<QuizAttempt[]> {
         return new Observable(observer => {
-            const filtered = this.attemptsSubject.value.filter(attempt => 
+            const filtered = this.attemptsSubject.value.filter(attempt =>
                 attempt.quizId === quizId
             );
             observer.next(filtered);
@@ -173,7 +180,7 @@ export class AnswerService {
 
     getAttemptsForUser(userId: string): Observable<QuizAttempt[]> {
         return new Observable(observer => {
-            const filtered = this.attemptsSubject.value.filter(attempt => 
+            const filtered = this.attemptsSubject.value.filter(attempt =>
                 attempt.userId === userId
             );
             observer.next(filtered);

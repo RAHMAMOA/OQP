@@ -95,4 +95,35 @@ export class AnswerReviewComponent {
       return '';
     }
   }
+
+  isAnswerCorrect(question: Question, userAnswer: string | number | boolean | string[]): boolean {
+    if (question.type === 'essay') {
+      if (!userAnswer || !question.correctAnswer) return false;
+
+      const userText = typeof userAnswer === 'string' ? userAnswer.trim().toLowerCase() : '';
+      const referenceText = (question.correctAnswer as string).trim().toLowerCase();
+
+      return userText === referenceText;
+    }
+
+    // Handle other question types
+    if (question.type === 'mcq' || question.type === 'true-false') {
+      return userAnswer === question.correctAnswer;
+    }
+
+    if (question.type === 'fill-blank') {
+      if (!userAnswer || !question.correctAnswer) return false;
+
+      const userAnswers = Array.isArray(userAnswer) ? userAnswer : [userAnswer];
+      const correctAnswers = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+
+      return userAnswers.every((answer: any) =>
+        correctAnswers.some((correct: any) =>
+          String(answer).trim().toLowerCase() === String(correct).trim().toLowerCase()
+        )
+      );
+    }
+
+    return false;
+  }
 }

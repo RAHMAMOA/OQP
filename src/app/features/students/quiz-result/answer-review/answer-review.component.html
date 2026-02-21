@@ -66,11 +66,13 @@
               <p class="text-gray-700 whitespace-pre-wrap font-medium">Your answer:</p>
               <p class="text-gray-900 whitespace-pre-wrap mt-2">{{ selectedAnswers[i] || 'No answer provided' }}</p>
             </div>
-            <div class="flex items-center space-x-2 text-sm text-purple-600 bg-purple-50 p-3 rounded-lg border border-purple-100">
+            <div class="flex items-center space-x-2 text-sm p-3 rounded-lg border"
+                 [class]="isAnswerCorrect(question, selectedAnswers[i]) ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-red-600 bg-red-50 border-red-100'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <path *ngIf="isAnswerCorrect(question, selectedAnswers[i])" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <path *ngIf="!isAnswerCorrect(question, selectedAnswers[i])" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
-              <span class="font-medium">Pending Manual Grading by Admin</span>
+              <span class="font-medium">{{ isAnswerCorrect(question, selectedAnswers[i]) ? 'Correct' : 'Incorrect' }}</span>
             </div>
           </div>
         </div>
