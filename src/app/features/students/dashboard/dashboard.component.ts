@@ -7,58 +7,106 @@ import { QuizService } from '../../../core/services/quiz.service';
 import { AttemptService } from '../../../core/services/result.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { Quiz } from '../../../core/models/quiz';
+import { User } from '../../../core/models/user';
+import { PlatformSettings } from '../../../core/models/settings';
+import { QuizAttempt } from '../../../core/models/answer';
+import { Stats } from '../../../core/models/stats';
 import { Observable, Subject } from 'rxjs';
 import { map, combineLatest, takeUntil } from 'rxjs';
+import { StatsCardsComponent } from '../../../shared/components/stats-cards/stats-cards.component';
+import { StatCard } from '../../../core/models/stat-card';
+import { AvailableQuizzes } from './available-quizzes/available-quizzes';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, StatsCardsComponent, AvailableQuizzes],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 
 export class DashboardComponent implements OnInit, OnDestroy {
   brandName = '';
-  user = {
-    name: '',
-    role: 'student'
-  };
+  user: User = { id: '', username: '', fullName: '', email: '', role: 'student' };
   quizzes$: Observable<Quiz[]>;
-  stats$: Observable<any[]>;
+  stats$: Observable<StatCard[]>;
   welcomeMessage = '';
-  settings: any;
+  settings: PlatformSettings = {
+    siteName: '',
+    welcomeMessage: '',
+    allowRetakes: true,
+    showCorrectAnswers: true
+  };
+  allAttempts: QuizAttempt[] = [];
+  currentUser: User | null;
   private destroy$ = new Subject<void>();
 
   constructor(private router: Router, private authService: AuthService, private quizService: QuizService, private attemptService: AttemptService, private settingsService: SettingsService) {
+    this.currentUser = this.authService.getCurrentUser();
     this.quizzes$ = this.quizService.getQuizzes();
     this.stats$ = this.calculateStats();
   }
 
-  calculateStats(): Observable<any[]> {
+  calculateStats(): Observable<StatCard[]> {
     return combineLatest([
       this.quizzes$,
       this.attemptService.getAttempts().pipe(
         map(allAttempts => {
-          const currentUser = this.authService.getCurrentUser();
-          if (!currentUser) return [];
-          return allAttempts.filter(attempt => attempt.user === currentUser.username);
+          if (!this.currentUser) return [];
+
+          // Check for both userId and user properties to handle legacy data
+          const filtered = allAttempts.filter(attempt =>
+            this.currentUser && (attempt.userId === this.currentUser.username || (attempt as any).user === this.currentUser.username)
+          );
+
+          this.allAttempts = filtered;
+          return filtered;
         })
       )
     ]).pipe(
       map(([quizzes, attempts]) => {
-        const quizzesTaken = attempts.length;
-        const totalScore = attempts.reduce((sum: number, attempt: any) => {
-          const score = parseInt(attempt.score) || 0;
-          return sum + score;
-        }, 0);
+        // Group attempts by quizId and find the highest score for each quiz
+        const bestScores = new Map<string, number>();
+
+        attempts.forEach(attempt => {
+          let score = 0;
+          if (attempt.percentage !== undefined && attempt.percentage !== null) {
+            score = Number(attempt.percentage.toString().replace(/[^0-9.-]/g, '')) || 0;
+          }
+          if (!bestScores.has(attempt.quizId) || score > bestScores.get(attempt.quizId)!) {
+            bestScores.set(attempt.quizId, score);
+          }
+        });
+
+        const quizzesTaken = bestScores.size;
+
+        let totalScore = 0;
+        bestScores.forEach(score => {
+          totalScore += score;
+        });
+
         const avgScore = quizzesTaken > 0 ? Math.round(totalScore / quizzesTaken) : 0;
 
         return [
-          { label: 'Available Quizzes', value: quizzes.length, icon: 'book' },
-          { label: 'Quizzes Taken', value: quizzesTaken, icon: 'history' },
-          { label: 'Avg Score', value: `${avgScore}%`, icon: 'trending-up' }
-        ];
+          {
+            label: 'Available Quizzes',
+            value: quizzes.length,
+            icon: 'quiz',
+            color: 'bg-emerald-50 text-emerald-500 border-emerald-200'
+          },
+          {
+            label: 'Quizzes Taken',
+            value: quizzesTaken,
+            icon: 'attempts',
+            color: 'bg-blue-50 text-blue-500 border-blue-200'
+          },
+          {
+            label: 'Avg Score',
+            value: `${avgScore}%`,
+            icon: 'trending-up',
+            color: 'bg-purple-50 text-purple-500 border-purple-200'
+          }
+        ] as StatCard[];
       })
     );
   }
@@ -74,7 +122,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
-      this.user.name = currentUser.fullName || currentUser.username;
+      this.user.fullName = currentUser.fullName || currentUser.username;
     }
   }
 
@@ -92,7 +140,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!currentUser) return false;
 
     const attempts = this.attemptService.getAttemptsByUser(currentUser.username);
-    return attempts.some(attempt => attempt.quizId === quizId);
+    return attempts.some(attempt =>
+      (attempt.userId === currentUser.username || (attempt as any).user === currentUser.username) &&
+      (attempt as any).quizId === quizId
+    );
   }
 
   getQuizButtonState(quizId: string) {

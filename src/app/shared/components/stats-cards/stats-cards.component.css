@@ -1,0 +1,75 @@
+.stats-grid {
+  @apply grid gap-6 mb-12;
+}
+
+.grid-cols-1 {
+  @apply grid-cols-1;
+}
+
+.grid-cols-2 {
+  @apply grid-cols-1 md:grid-cols-2;
+}
+
+.grid-cols-3 {
+  @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.grid-cols-4 {
+  @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+}
+
+.stat-card {
+  @apply flex items-center gap-5 rounded-2xl bg-white p-6 shadow-sm border border-slate-100 transition-shadow hover:shadow-md;
+}
+
+.stat-icon-wrapper {
+  @apply flex h-12 w-12 items-center justify-center rounded-xl;
+}
+
+.icon {
+  @apply h-6 w-6 fill-none stroke-current;
+}
+
+.stat-content {
+  @apply flex-1;
+}
+
+.stat-value {
+  @apply text-2xl font-bold leading-none text-slate-900;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-trend {
+  @apply text-sm font-medium;
+}
+
+.stat-label {
+  @apply mt-1 text-sm text-slate-500;
+}
+
+/* Color variants */
+.bg-emerald-50.text-emerald-500.border-emerald-200 {
+  @apply bg-emerald-50 text-emerald-500 border-emerald-200;
+}
+
+.bg-red-50.text-red-500.border-red-200 {
+  @apply bg-red-50 text-red-500 border-red-200;
+}
+
+.bg-blue-50.text-blue-500.border-blue-200 {
+  @apply bg-blue-50 text-blue-500 border-blue-200;
+}
+
+.bg-purple-50.text-purple-500.border-purple-200 {
+  @apply bg-purple-50 text-purple-500 border-purple-200;
+}
+
+.bg-amber-50.text-amber-500.border-amber-200 {
+  @apply bg-amber-50 text-amber-500 border-amber-200;
+}
+
+.bg-gray-50.text-gray-500.border-gray-200 {
+  @apply bg-gray-50 text-gray-500 border-gray-200;
+}

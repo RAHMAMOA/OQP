@@ -9,7 +9,7 @@
           </svg>
         </button>
         <h1 class="text-xl font-bold text-gray-900">
-          {{ reviewMode ? 'Review Answers' : 'Quiz Results' }}
+          {{ resultState.reviewMode ? 'Review Answers' : 'Quiz Results' }}
         </h1>
       </div>
     </div>
@@ -17,168 +17,49 @@
 
   <!-- Main Content -->
   <main class="max-w-4xl mx-auto px-6 py-8">
-    <!-- Result Banner -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-      <!-- Status Banner -->
-      <div class="px-8 py-6 text-center"
-           [class]="passed ? 'bg-emerald-500' : 'bg-red-500'">
-        <div class="flex items-center justify-center space-x-3 mb-2">
-          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
-          </svg>
-          <h2 *ngIf="!passed" class="text-2xl font-bold text-white">Better Luck Next Time</h2>
-          <h2 *ngIf="passed" class="text-2xl font-bold text-white">Congratulations!</h2>
-        </div>
-        <p class="text-white text-lg">{{ quizName || 'Quiz' }}</p>
-      </div>
+    <!-- Result Banner Component -->
+    <app-result-banner 
+      [passed]="resultData.passed"
+      [quizName]="resultState.quizName"
+      [score]="resultData.score"
+      [passingScore]="resultSettings.passingScore">
+    </app-result-banner>
 
-      <!-- Score Cards -->
-      <div class="p-8">
-        <div class="grid grid-cols-2 gap-4 mb-8" *ngIf="!showCorrectAnswers">
-          <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-gray-900">{{ score }}%</div>
-            <div class="text-sm text-gray-500">Score</div>
-          </div>
-          <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold" [class]="passed ? 'text-emerald-600' : 'text-red-600'">
-              {{ passed ? 'PASSED' : 'FAILED' }}
-            </div>
-            <div class="text-sm text-gray-500">Status</div>
-          </div>
-        </div>
+    <!-- Score Cards Component -->
+    <app-score-cards
+      [score]="resultData.score"
+      [correct]="resultData.correct"
+      [wrong]="resultData.wrong"
+      [totalQuestions]="resultData.totalQuestions"
+      [passed]="resultData.passed"
+      [passingScore]="resultSettings.passingScore"
+      [showCorrectAnswers]="resultSettings.showCorrectAnswers">
+    </app-score-cards>
 
-        <div class="grid grid-cols-4 gap-4 mb-8" *ngIf="showCorrectAnswers">
-          <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-gray-900">{{ correct }}/{{ totalQuestions || 5 }}</div>
-            <div class="text-sm text-gray-500">Score</div>
-          </div>
-          <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-gray-900">{{ score }}%</div>
-            <div class="text-sm text-gray-500">Percentage</div>
-          </div>
-          <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-gray-900">{{ correct }}</div>
-            <div class="text-sm text-gray-500">Correct</div>
-          </div>
-          <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-gray-900">{{ wrong }}</div>
-            <div class="text-sm text-gray-500">Wrong</div>
-          </div>
-        </div>
+    <!-- Answer Review Component -->
+    <app-answer-review
+      *ngIf="resultState.attempt && selectedAnswers && resultSettings.showCorrectAnswers"
+      [questions]="resultState.questions"
+      [selectedAnswers]="selectedAnswers"
+      [showCorrectAnswers]="resultSettings.showCorrectAnswers">
+    </app-answer-review>
 
-        <!-- Status Banner -->
-        <div class="px-6 py-4 rounded-xl text-center mb-8"
-             [class]="passed ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'">
-          <div class="text-lg font-bold">
-            <span *ngIf="!passed">X FAILED - Passing score is {{ passingScore }}%</span>
-            <span *ngIf="passed"> PASSED - Passing score is {{ passingScore }}%</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Review Answers Section -->
-    <div *ngIf="attempt && attempt.selectedAnswers && showCorrectAnswers" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-      <h3 class="text-xl font-bold text-gray-900 mb-6">Review Answers</h3>
-      
-      <div class="space-y-6">
-        <div *ngFor="let question of questions; let i = index" class="border-b border-gray-100 pb-6 last:border-b-0">
-          <div class="flex items-start space-x-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">
-              {{ i + 1 }}
-            </div>
-            <div class="flex-1">
-              <h4 class="font-semibold text-gray-900 mb-3">{{ question.text }}</h4>
-              
-              <!-- Multiple Choice Options -->
-              <div *ngIf="question.type === 'mcq'" class="space-y-2">
-                <div *ngFor="let option of question.options; let j = index" 
-                     class="flex items-center space-x-3 p-3 rounded-lg"
-                     [class]="getAnswerClass(i, j, option)">
-                  <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-                       [class]="getOptionBorderClass(i, j, option)">
-                    <div *ngIf="attempt.selectedAnswers[i] === j" class="w-2 h-2 rounded-full bg-white"></div>
-                  </div>
-                  <span class="text-gray-700">{{ option }}</span>
-                  <div *ngIf="getOptionIcon(i, j, option)" class="ml-auto">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path *ngIf="getOptionIcon(i, j, option) === 'correct'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                      <path *ngIf="getOptionIcon(i, j, option) === 'incorrect'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- True/False Options -->
-              <div *ngIf="question.type === 'true-false'" class="space-y-2">
-                <div class="flex items-center space-x-3 p-3 rounded-lg"
-                     [class]="getTrueFalseClass(i, true)">
-                  <span class="text-gray-700">True</span>
-                  <div *ngIf="getTrueFalseIcon(i, true)" class="ml-auto">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path *ngIf="getTrueFalseIcon(i, true) === 'correct'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                      <path *ngIf="getTrueFalseIcon(i, true) === 'incorrect'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                    </svg>
-                  </div>
-                </div>
-                <div class="flex items-center space-x-3 p-3 rounded-lg"
-                     [class]="getTrueFalseClass(i, false)">
-                  <span class="text-gray-700">False</span>
-                  <div *ngIf="getTrueFalseIcon(i, false)" class="ml-auto">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path *ngIf="getTrueFalseIcon(i, false) === 'correct'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                      <path *ngIf="getTrueFalseIcon(i, false) === 'incorrect'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Essay Question -->
-              <div *ngIf="question.type === 'essay'" class="space-y-3">
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <p class="text-gray-700 whitespace-pre-wrap">{{ attempt.selectedAnswers[i] || 'No answer provided' }}</p>
-                </div>
-                <div class="text-sm text-gray-500">
-                  <span class="font-medium">Note:</span> Essay questions require manual grading by instructor
-                </div>
-              </div>
-
-              <!-- Fill in the Blanks Question -->
-              <div *ngIf="question.type === 'fill-blank'" class="space-y-3">
-                <div class="space-y-2">
-                  <div *ngFor="let blank of question.blanks; let j = index" class="flex items-center space-x-3">
-                    <span class="text-gray-700">Blank {{ j + 1 }}:</span>
-                    <div class="flex-1 bg-gray-50 rounded-lg p-3 border" 
-                         [class]="getBlankClass(i, j)">
-                      <span class="text-gray-800">{{ attempt.selectedAnswers[i]?.[j] || 'No answer' }}</span>
-                    </div>
-                    <div *ngIf="getBlankIcon(i, j)" class="ml-3">
-                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path *ngIf="getBlankIcon(i, j) === 'correct'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        <path *ngIf="getBlankIcon(i, j) === 'incorrect'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="flex justify-center gap-4 mt-8">
-      <button (click)="goToDashboard()" 
-              class="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
-        Back to Dashboard
-      </button>
-      
-      <button *ngIf="canRetakeQuiz()" 
-              (click)="goToQuiz()"
-              class="px-6 py-3 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors">
-        Retake Quiz
-      </button>
-    </div>
+    <!-- Result Actions Component -->
+    <app-result-actions
+      [reviewMode]="resultState.reviewMode"
+      (goToDashboard)="goToDashboard()"
+      (retakeQuiz)="retakeQuiz()">
+    </app-result-actions>
   </main>
+
+  <!-- Retake Confirmation Dialog -->
+  <app-confirmation-dialog
+    *ngIf="showRetakeConfirmation"
+    title="Retake Quiz?"
+    message="Are you sure you want to retake this quiz? Your previous attempt will be saved."
+    confirmText="Retake Quiz"
+    cancelText="Cancel"
+    (confirmed)="confirmRetakeQuiz()"
+    (cancelled)="cancelRetakeQuiz()">
+  </app-confirmation-dialog>
 </div>

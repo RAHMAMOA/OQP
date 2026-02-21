@@ -1,80 +1,71 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Attempt } from '../models/attempet';
+import { Observable } from 'rxjs';
+import { QuizAttempt } from '../models/answer';
+import { AnswerService } from './answer.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AttemptService {
-    private attemptsSubject = new BehaviorSubject<Attempt[]>([]);
-    attempts$ = this.attemptsSubject.asObservable();
-    private storageKey = 'quiz_attempts';
+    constructor(private answerService: AnswerService) { }
 
-    constructor() {
-        this.loadFromLocalStorage();
-
-        // Add global function for clearing attempts (for testing)
-        (window as any).clearAllAttempts = () => {
-            this.clearAllAttempts();
-        };
+    getAttempts(): Observable<QuizAttempt[]> {
+        return this.answerService.attempts$;
     }
 
-    private loadFromLocalStorage() {
-        const storedAttempts = localStorage.getItem(this.storageKey);
-        if (storedAttempts) {
-            try {
-                const attempts = JSON.parse(storedAttempts);
-                this.attemptsSubject.next(attempts);
-            } catch (error) {
-                console.error('Error parsing attempts from localStorage', error);
-            }
-        }
+    addAttempt(attempt: QuizAttempt) {
+        // Obsolete: AnswerService manages attempt addition via submitQuizAttempt
+        console.warn('AttemptService.addAttempt is deprecated. Use AnswerService instead.');
     }
 
-    private saveToLocalStorage(attempts: Attempt[]) {
-        localStorage.setItem(this.storageKey, JSON.stringify(attempts));
-    }
-
-    getAttempts(): Observable<Attempt[]> {
-        return this.attempts$;
-    }
-
-    addAttempt(attempt: Attempt) {
-        const currentAttempts = this.attemptsSubject.value;
-        const updatedAttempts = [...currentAttempts, attempt];
-        this.attemptsSubject.next(updatedAttempts);
-        this.saveToLocalStorage(updatedAttempts);
-    }
-
-    getAttemptsByUser(username: string): Attempt[] {
-        return this.attemptsSubject.value.filter(attempt => attempt.user === username);
+    getAttemptsByUser(userId: string): QuizAttempt[] {
+        let userAttempts: QuizAttempt[] = [];
+        this.answerService.getAttemptsForUser(userId).subscribe(attempts => userAttempts = attempts);
+        return userAttempts;
     }
 
     clearAllAttempts(): void {
-        this.attemptsSubject.next([]);
-        localStorage.removeItem(this.storageKey);
-        console.log('All attempts cleared from localStorage');
+        // For testing purposes
+        localStorage.removeItem('quizAttempts');
+        window.location.reload();
     }
 
-    getUserStats(username: string): { quizzesTaken: number; avgScore: number; passRate: number } {
-        const userAttempts = this.getAttemptsByUser(username);
+    getUserStats(userId: string): { quizzesTaken: number; avgScore: number; passRate: number } {
+        const userAttempts = this.getAttemptsByUser(userId);
 
-        console.log(`getUserStats for ${username}:`);
-        console.log('All attempts:', this.attemptsSubject.value);
+        console.log(`getUserStats for ${userId}:`);
         console.log('User attempts:', userAttempts);
 
-        if (userAttempts.length === 0) {
+        const bestScores = new Map<string, number>();
+
+        userAttempts.forEach(attempt => {
+            let score = 0;
+            if (attempt.percentage !== undefined && attempt.percentage !== null) {
+                score = Number(attempt.percentage.toString().replace(/[^0-9.-]/g, '')) || 0;
+            }
+            if (!bestScores.has(attempt.quizId) || score > bestScores.get(attempt.quizId)!) {
+                bestScores.set(attempt.quizId, score);
+            }
+        });
+
+        if (bestScores.size === 0) {
             return { quizzesTaken: 0, avgScore: 0, passRate: 0 };
         }
 
-        const scores = userAttempts.map(attempt => parseInt(attempt.score) || 0);
-        const totalScore = scores.reduce((sum, score) => sum + score, 0);
-        const avgScore = Math.round(totalScore / scores.length);
-        const passCount = scores.filter(score => score >= 50).length;
-        const passRate = Math.round((passCount / scores.length) * 100);
+        let totalScore = 0;
+        let passCount = 0;
+        bestScores.forEach(score => {
+            totalScore += score;
+            if (score >= 50) {
+                passCount++;
+            }
+        });
+
+        const avgScore = Math.round(totalScore / bestScores.size);
+        const passRate = Math.round((passCount / bestScores.size) * 100);
 
         const result = {
-            quizzesTaken: userAttempts.length,
+            quizzesTaken: bestScores.size,
             avgScore,
             passRate
         };

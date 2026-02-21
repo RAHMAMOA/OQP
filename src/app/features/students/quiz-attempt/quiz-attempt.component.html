@@ -1,99 +1,31 @@
 <div class="min-h-screen bg-gray-50 font-['Inter',-apple-system,sans-serif]">
-  <!-- Header -->
-  <header class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-      <div class="flex justify-between items-center">
-        <div class="flex items-center space-x-4">
-          <button routerLink="/dashboard" class="text-gray-500 hover:text-gray-900 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-          </button>
-          <h1 class="text-xl font-bold text-gray-900">{{ quiz?.title || 'Quiz' }}</h1>
-        </div>
-        <div class="flex items-center space-x-6">
-          <div class="text-sm text-gray-500">
-            Question {{ currentQuestionIndex + 1 }} of {{ quiz?.questionCount || 0 }}
-          </div>
-          <div class="flex items-center space-x-2 bg-red-50 px-4 py-2 rounded-lg">
-            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span class="font-bold text-red-600">{{ formatTime(timeRemaining) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <!-- Quiz Header Component -->
+  <app-quiz-header 
+    [quiz]="quiz"
+    [currentQuestionIndex]="currentQuestionIndex"
+    [timeRemaining]="timeRemaining"
+    (exitQuiz)="exitQuiz()">
+  </app-quiz-header>
 
   <!-- Main Content -->
   <main class="max-w-4xl mx-auto px-6 py-8" *ngIf="!isLoading && quiz && getCurrentQuestion()">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-      <!-- Question -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">
-          Q{{ currentQuestionIndex + 1 }}. {{ getCurrentQuestion()?.text }}
-        </h2>
-        
-        <!-- Multiple Choice Options -->
-        <div *ngIf="getCurrentQuestion()?.type === 'mcq'" class="space-y-3">
-          <div *ngFor="let option of getCurrentQuestion()?.options; let i = index" 
-               class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"
-               [class]="selectedAnswers[currentQuestionIndex] === i ? 'border-emerald-500 bg-emerald-50' : ''"
-               (click)="selectAnswer(currentQuestionIndex, i)">
-            <span class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-gray-600 mr-4">
-              {{ String.fromCharCode(65 + i) }}
-            </span>
-            <span class="text-gray-700 font-medium">{{ option }}</span>
-          </div>
-        </div>
+      <!-- Question Display Component -->
+      <app-question-display
+        [question]="getCurrentQuestion()"
+        [questionIndex]="currentQuestionIndex"
+        [selectedAnswer]="selectedAnswers[currentQuestionIndex]"
+        (answerSelected)="onAnswerSelected($event)">
+      </app-question-display>
 
-        <!-- True/False Options -->
-        <div *ngIf="getCurrentQuestion()?.type === 'true-false'" class="space-y-3">
-          <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"
-                 [class]="selectedAnswers[currentQuestionIndex] === true ? 'border-emerald-500 bg-emerald-50' : ''">
-            <input type="radio" [name]="'question-' + currentQuestionIndex" [value]="true" 
-                   (change)="selectAnswer(currentQuestionIndex, true)" 
-                   [checked]="selectedAnswers[currentQuestionIndex] === true" class="mr-4">
-            <span class="text-gray-700 font-medium">True</span>
-          </label>
-          
-          <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"
-                 [class]="selectedAnswers[currentQuestionIndex] === false ? 'border-emerald-500 bg-emerald-50' : ''">
-            <input type="radio" [name]="'question-' + currentQuestionIndex" [value]="false" 
-                   (change)="selectAnswer(currentQuestionIndex, false)" 
-                   [checked]="selectedAnswers[currentQuestionIndex] === false" class="mr-4">
-            <span class="text-gray-700 font-medium">False</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Navigation Buttons -->
-      <div class="flex justify-between items-center">
-        <button (click)="previousQuestion()" 
-                [disabled]="currentQuestionIndex === 0"
-                class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          Previous
-        </button>
-        
-        <div class="flex space-x-3">
-          <button routerLink="/dashboard" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">
-            Exit Quiz
-          </button>
-          
-          <button *ngIf="currentQuestionIndex < quiz.questionCount - 1" 
-                  (click)="nextQuestion()"
-                  class="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors">
-            Next
-          </button>
-          
-          <button *ngIf="currentQuestionIndex === quiz.questionCount - 1" 
-                  (click)="submitQuiz()"
-                  class="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors">
-            Submit Quiz
-          </button>
-        </div>
-      </div>
+      <!-- Quiz Navigation Component -->
+      <app-quiz-navigation
+        [quiz]="quiz"
+        [currentQuestionIndex]="currentQuestionIndex"
+        (nextQuestion)="nextQuestion()"
+        (submitQuiz)="submitQuiz()"
+        (exitQuiz)="exitQuiz()">
+      </app-quiz-navigation>
     </div>
   </main>
 

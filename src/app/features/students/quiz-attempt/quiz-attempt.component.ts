@@ -3,37 +3,44 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { QuizService } from '../../../core/services/quiz.service';
-import { AttemptService } from '../../../core/services/result.service';
+import { AnswerService } from '../../../core/services/answer.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Quiz } from '../../../core/models/quiz';
 import { Question } from '../../../core/models/question';
+import { QuizAttempt } from '../../../core/models/answer';
 import { Subject, takeUntil } from 'rxjs';
+import { QuizHeaderComponent } from './quiz-header/quiz-header.component';
+import { QuestionDisplayComponent } from './question-display/question-display.component';
+import { QuizNavigationComponent } from './quiz-navigation/quiz-navigation.component';
 
 @Component({
   selector: 'app-quiz-attempt',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, QuizHeaderComponent, QuestionDisplayComponent, QuizNavigationComponent],
   templateUrl: './quiz-attempt.component.html'
 })
 export class QuizAttemptComponent implements OnInit, OnDestroy {
   quiz: Quiz | null = null;
   currentQuestionIndex = 0;
-  selectedAnswers: { [key: string]: any } = {};
+  currentAttempt: QuizAttempt | null = null;
   timeRemaining = 0;
   timer: any;
   isLoading = true;
   String = String; // Add String constructor for template access
   passingScore = 50;
-  questions: any[] = [];
+  questions: Question[] = [];
   totalQuestions = 0;
+  selectedAnswers: (number | boolean | string)[] = [];
   private destroy$ = new Subject<void>();
+  maxAttempts = 0;
+  allowRetakes = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private quizService: QuizService,
-    private attemptService: AttemptService,
+    private answerService: AnswerService,
     private settingsService: SettingsService,
     private authService: AuthService
   ) { }
@@ -46,6 +53,8 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(settings => {
         this.passingScore = settings.passingScore || 50;
+        this.maxAttempts = settings.maxAttempts || 0;
+        this.allowRetakes = settings.allowRetakes || false;
       });
 
     if (quizId) {
@@ -54,6 +63,34 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
   }
 
   loadQuiz(quizId: string) {
+    // Check attempt limit first
+    if (!this.allowRetakes) {
+      alert('Quiz retakes are not allowed by administrator.');
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    if (this.maxAttempts > 0) {
+      const currentUser = this.authService.getCurrentUser();
+      this.answerService.getAttemptsForUser(currentUser?.username || '').subscribe(attempts => {
+        const quizAttempts = attempts.filter(attempt => attempt.quizId === quizId);
+
+        if (quizAttempts.length >= this.maxAttempts) {
+          alert(`You have reached the maximum number of attempts (${this.maxAttempts}) for this quiz.`);
+          this.router.navigate(['/dashboard']);
+          return;
+        }
+
+        // If we get here, we can proceed with loading the quiz
+        this.proceedWithQuizLoad(quizId);
+      });
+    } else {
+      // Unlimited attempts, proceed directly
+      this.proceedWithQuizLoad(quizId);
+    }
+  }
+
+  proceedWithQuizLoad(quizId: string) {
     this.quizService.quizzes$.subscribe(quizzes => {
       const found = quizzes.find(q => q.id === quizId);
       console.log('Quiz loading - Quiz ID:', quizId);
@@ -64,9 +101,15 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
         this.quiz = found;
         this.questions = found.questions || [];
         this.totalQuestions = this.questions.length;
+        this.selectedAnswers = new Array(this.totalQuestions).fill(undefined);
         console.log('Quiz loading - Questions:', this.questions);
         console.log('Quiz loading - Question count:', this.totalQuestions);
         this.timeRemaining = found.time * 60; // Convert minutes to seconds
+
+        // Start quiz attempt
+        const maxScore = this.questions.reduce((sum, q) => sum + q.points, 0);
+        this.currentAttempt = this.answerService.startQuizAttempt(quizId, maxScore);
+
         this.startTimer();
       }
       this.isLoading = false;
@@ -89,13 +132,45 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
   }
 
   selectAnswer(questionIndex: number, answer: any) {
+    if (!this.currentAttempt || !this.questions[questionIndex]) return;
+
+    // Store the selected answer for UI display
     this.selectedAnswers[questionIndex] = answer;
+
+    const question = this.questions[questionIndex];
+    let selectedAnswer: string | number | boolean | undefined;
+    let textAnswer: string | undefined;
+
+    switch (question.type) {
+      case 'mcq':
+        selectedAnswer = answer;
+        break;
+      case 'true-false':
+        selectedAnswer = answer;
+        break;
+      case 'fill-blank':
+        textAnswer = answer;
+        break;
+      case 'essay':
+        textAnswer = answer;
+        break;
+    }
+
+    this.answerService.addAnswer(question, selectedAnswer, textAnswer);
+  }
+
+  onAnswerSelected(event: { questionIndex: number; answer: any }) {
+    this.selectAnswer(event.questionIndex, event.answer);
   }
 
   nextQuestion() {
     if (this.quiz && this.currentQuestionIndex < this.quiz.questionCount - 1) {
       this.currentQuestionIndex++;
     }
+  }
+
+  exitQuiz() {
+    this.router.navigate(['/dashboard']);
   }
 
   previousQuestion() {
@@ -118,74 +193,29 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
       clearInterval(this.timer);
     }
 
-    if (!this.quiz) {
-      console.log('No quiz data found');
+    if (!this.currentAttempt) {
+      console.log('No active attempt found');
       return;
     }
 
-    // Calculate score by checking actual answers
-    const totalQuestions = this.quiz.questions?.length || this.quiz.questionCount;
-    let correctAnswers = 0;
+    // Submit the attempt
+    const submittedAttempt = this.answerService.submitQuizAttempt();
 
-    if (this.quiz.questions) {
-      this.quiz.questions.forEach((question: any, index: number) => {
-        const userAnswer = this.selectedAnswers[index];
+    if (submittedAttempt) {
+      console.log('Attempt submitted:', submittedAttempt);
 
-        if (question.type === 'mcq' || question.type === 'true-false') {
-          // Handle both string and number correct answers
-          const isCorrect = userAnswer === question.correctAnswer ||
-            parseInt(userAnswer) === parseInt(question.correctAnswer) ||
-            userAnswer?.toString() === question.correctAnswer?.toString();
-
-          if (isCorrect) {
-            correctAnswers++;
-          }
-        } else if (question.type === 'fill-blank') {
-          const correctAnswersArray = question.correctAnswers || [];
-          let allBlanksCorrect = true;
-
-          if (Array.isArray(userAnswer) && correctAnswersArray.length > 0) {
-            userAnswer.forEach((answer: string, blankIndex: number) => {
-              const correctAnswer = correctAnswersArray[blankIndex];
-              if (answer?.toLowerCase().trim() !== correctAnswer?.toLowerCase().trim()) {
-                allBlanksCorrect = false;
-              }
-            });
-
-            if (allBlanksCorrect) {
-              correctAnswers++;
-            }
-          }
+      this.router.navigate(['/quiz-result', submittedAttempt.quizId], {
+        queryParams: {
+          score: submittedAttempt.percentage,
+          correct: submittedAttempt.totalScore,
+          wrong: submittedAttempt.maxScore - submittedAttempt.totalScore,
+          attemptId: submittedAttempt.id
         }
-        // Essay questions are not auto-graded
       });
+    } else {
+      console.log('Failed to submit attempt');
+      this.router.navigate(['/dashboard']);
     }
-
-    const score = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-
-    // Save attempt
-    const currentUser = this.authService.getCurrentUser();
-    const attempt = {
-      id: Date.now().toString(),
-      quizId: this.quiz.id,
-      quizName: this.quiz.title,
-      user: currentUser ? currentUser.username : 'student',
-      date: new Date().toISOString(),
-      score: score.toString(),
-      status: score >= this.passingScore ? 'Passed' : 'Failed',
-      correctAnswers,
-      wrongAnswers: totalQuestions - correctAnswers,
-      totalQuestions,
-      selectedAnswers: this.selectedAnswers
-    };
-
-    console.log('About to save attempt:', attempt);
-    this.attemptService.addAttempt(attempt);
-    console.log('Attempt saved, navigating to results');
-
-    this.router.navigate(['/quiz-result', this.quiz.id], {
-      queryParams: { score, correct: correctAnswers, wrong: totalQuestions - correctAnswers }
-    });
   }
 
   ngOnDestroy() {

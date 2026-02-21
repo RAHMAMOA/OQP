@@ -5,11 +5,12 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { QuizService } from '../../../../../core/services/quiz.service';
 import { Quiz } from '../../../../../core/models/quiz';
 import { Question, QuestionType } from '../../../../../core/models/question';
+import { EditQuestionComponent } from './edit-question/edit-question.component';
 
 @Component({
   selector: 'app-edit-quiz',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, EditQuestionComponent],
   templateUrl: './edit-quiz.component.html'
 })
 export class EditQuizComponent implements OnInit {
@@ -26,7 +27,7 @@ export class EditQuizComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private quizService: QuizService
-  ) {}
+  ) { }
 
   ngOnInit() {
     const quizId = this.route.snapshot.paramMap.get('id');
@@ -52,19 +53,37 @@ export class EditQuizComponent implements OnInit {
 
   addQuestion(type: QuestionType) {
     this.isDropdownOpen = false;
-    const newQuestion: Question = {
-      id: Date.now().toString(),
-      text: '',
-      type: type,
-      points: 1,
-      options: type === 'mcq' ? ['', '', '', ''] : undefined,
-      correctAnswer: type === 'true-false' ? true : ''
-    };
-    this.questions.push(newQuestion);
+
+    if (!this.quiz) return;
+
+    // Add question using QuizService
+    const updatedQuiz = this.quizService.addQuestionToQuiz(this.quiz.id, type);
+    if (updatedQuiz) {
+      this.quiz = updatedQuiz;
+      this.questions = updatedQuiz.questions || [];
+    }
   }
 
   removeQuestion(index: number) {
-    this.questions.splice(index, 1);
+    if (!this.quiz || !this.questions[index]) return;
+
+    const questionId = this.questions[index].id;
+    const updatedQuiz = this.quizService.removeQuestionFromQuiz(this.quiz.id, questionId);
+    if (updatedQuiz) {
+      this.quiz = updatedQuiz;
+      this.questions = updatedQuiz.questions || [];
+    }
+  }
+
+  updateQuestion(index: number, updatedQuestion: Question) {
+    if (!this.quiz || !this.questions[index]) return;
+
+    const questionId = this.questions[index].id;
+    const updatedQuiz = this.quizService.updateQuestionInQuiz(this.quiz.id, questionId, updatedQuestion);
+    if (updatedQuiz) {
+      this.quiz = updatedQuiz;
+      this.questions = updatedQuiz.questions || [];
+    }
   }
 
   updateQuiz() {
@@ -81,15 +100,12 @@ export class EditQuizComponent implements OnInit {
       questionCount: this.questions.length
     };
 
-    // Include questions in the update
-    const quizWithQuestions = {
-      ...updatedQuiz,
-      questions: this.questions
-    } as any;
-
-    console.log('Updating Quiz:', quizWithQuestions);
-    this.quizService.updateQuiz(updatedQuiz);
-    this.router.navigate(['/admin/quizzes']);
+    // Update quiz with questions using service
+    const result = this.quizService.updateQuizWithQuestions(this.quiz.id, updatedQuiz, this.questions);
+    if (result) {
+      console.log('Quiz updated successfully');
+      this.router.navigate(['/admin/quizzes']);
+    }
   }
 
   cancel() {

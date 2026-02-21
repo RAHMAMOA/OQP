@@ -38,14 +38,16 @@
                             
                             <div>
                                 <h3 class="font-bold text-slate-900 text-lg">{{ attempt.quizName }}</h3>
-                                <p class="text-sm text-slate-500">{{ formatDate(attempt.date) }}</p>
+                                <p class="text-sm text-slate-500">{{ attempt.date | formatDate:'long' }}</p>
                             </div>
                         </div>
 
                         <!-- Status Badge -->
                         <span class="px-3 py-1 rounded-full text-sm font-semibold"
-                              [ngClass]="getStatusClass(attempt.status)">
-                            {{ attempt.status }}
+                              [class.bg-emerald-500]="(attempt.score | status:50) === 'Passed'"
+                              [class.bg-red-500]="(attempt.score | status:50) === 'Failed'"
+                              [class.text-white]="true">
+                            {{ attempt.score | status:50 }}
                         </span>
                     </div>
 

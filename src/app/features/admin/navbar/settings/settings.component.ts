@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SettingsService } from '../../../../core/services/settings.service';
 import { PlatformSettings } from '../../../../core/models/settings';
+import { BrandingSettingsComponent } from './branding-settings/branding-settings.component';
+import { PlatformSettingsComponent } from './platform-settings/platform-settings.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, BrandingSettingsComponent, PlatformSettingsComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })

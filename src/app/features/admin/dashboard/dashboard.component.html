@@ -8,7 +8,7 @@
   <!-- Stats Grid -->
   <section>
     <ng-container *ngIf="stats$ | async as stats">
-      <app-stats-cards [stats]="stats"></app-stats-cards>
+      <app-stats-cards [stats]="stats" [columns]="4"></app-stats-cards>
     </ng-container>
   </section>
 
@@ -20,7 +20,7 @@
   <!-- Recent Attempts -->
   <section>
     <ng-container *ngIf="recentAttempts$ | async as recentAttempts">
-      <app-recent-attempts [attempts]="recentAttempts"></app-recent-attempts>
+      <app-recent-attempts [attempts]="recentAttempts | truncate:5"></app-recent-attempts>
     </ng-container>
   </section>
 </div>

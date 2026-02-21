@@ -1,0 +1,12 @@
+<!-- Action Buttons -->
+<div class="flex justify-center gap-4 mt-8">
+  <button (click)="onGoToDashboard()" 
+          class="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
+    Back to Dashboard
+  </button>
+  
+  <button *ngIf="!reviewMode" (click)="onRetakeQuiz()" 
+          class="px-6 py-3 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors">
+    Retake Quiz
+  </button>
+</div>

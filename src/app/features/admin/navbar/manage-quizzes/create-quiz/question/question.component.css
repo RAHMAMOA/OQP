@@ -1,0 +1,124 @@
+/* Question Component Styles */
+.question-container {
+  @apply space-y-6;
+}
+
+.question-header {
+  @apply flex justify-between items-start;
+}
+
+.question-title {
+  @apply text-lg font-bold text-gray-900;
+}
+
+.question-type {
+  @apply text-xs text-gray-500 font-medium uppercase tracking-wider ml-2;
+}
+
+.remove-btn {
+  @apply text-red-400 hover:text-red-600 p-1 rounded-lg hover:bg-red-50 transition-colors;
+}
+
+.question-text {
+  @apply w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none bg-gray-50/50;
+}
+
+.mcq-container {
+  @apply space-y-3 pl-4 border-l-2 border-emerald-100;
+}
+
+.option-container {
+  @apply flex items-center space-x-3;
+}
+
+.radio-input {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  border: 2px solid rgb(209 213 219);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.radio-input:checked {
+  border-color: rgb(16 185 129);
+  background-color: rgb(16 185 129);
+}
+
+.radio-indicator {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: white;
+  border-radius: 9999px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.radio-input:checked ~ .radio-indicator {
+  opacity: 1;
+}
+
+.option-input {
+  @apply flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 transition-all outline-none text-sm;
+}
+
+.remove-option-btn {
+  @apply text-red-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors;
+}
+
+.add-option-btn {
+  @apply text-emerald-600 hover:text-emerald-700 text-sm font-medium flex items-center space-x-1 mt-2 ml-9;
+}
+
+.tf-container {
+  @apply flex space-x-6 pl-4 border-l-2 border-blue-100;
+}
+
+.tf-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.tf-option {
+  font-weight: 500;
+  color: rgb(55 65 81);
+  transition: color 0.15s ease-in-out;
+}
+
+.tf-label:hover .tf-option {
+  color: rgb(37 99 235);
+}
+
+.fill-blank-container {
+  @apply pl-4 border-l-2 border-amber-100;
+}
+
+.fill-blank-input {
+  @apply w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-amber-500 focus:ring-4 focus:ring-amber-50 transition-all outline-none text-sm;
+}
+
+.essay-container {
+  @apply pl-4 border-l-2 border-purple-100;
+}
+
+.essay-note {
+  @apply text-sm text-gray-500 italic;
+}
+
+.points-container {
+  @apply pt-4 border-t border-gray-100 flex justify-end;
+}
+
+.points-label {
+  @apply text-sm font-bold text-gray-500;
+}
+
+.points-input {
+  @apply w-20 px-3 py-1 rounded-lg border border-gray-200 focus:border-emerald-500 text-center font-bold text-gray-700 outline-none;
+}

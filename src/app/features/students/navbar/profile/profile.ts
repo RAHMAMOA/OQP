@@ -5,12 +5,15 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { AttemptService } from '../../../../core/services/result.service';
 import { SettingsService } from '../../../../core/services/settings.service';
 import { User } from '../../../../core/models/user';
+import { QuizAttempt } from '../../../../core/models/answer';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ProfileInfoComponent } from './profile-info/profile-info.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ProfileInfoComponent, EditProfileComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -73,14 +76,14 @@ export class Profile implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(allAttempts => {
       // Filter attempts for current user
-      const userAttempts = allAttempts.filter(attempt => attempt.user === currentUser.username);
+      const userAttempts = allAttempts.filter(attempt => attempt.userId === currentUser.username);
 
       // Calculate real statistics
       this.calculateStats(userAttempts);
     });
   }
 
-  private calculateStats(attempts: any[]) {
+  private calculateStats(attempts: QuizAttempt[]) {
     if (attempts.length === 0) {
       this.stats = {
         quizzesTaken: 0,
@@ -92,7 +95,7 @@ export class Profile implements OnInit, OnDestroy {
     }
 
     const quizzesTaken = attempts.length;
-    const scores = attempts.map(attempt => parseInt(attempt.score) || 0);
+    const scores = attempts.map(attempt => Math.round(attempt.percentage) || 0);
     const totalScore = scores.reduce((sum, score) => sum + score, 0);
     const avgScore = Math.round(totalScore / scores.length);
     const bestScore = Math.max(...scores);

@@ -2,22 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../../../core/services/user.service';
 import { AttemptService } from '../../../../core/services/result.service';
+import { StudentDataComponent } from './student-data/student-data.component';
+import { StudentStatsComponent } from './student-stats/student-stats.component';
+import { StudentData } from '../../../../core/models/student-data';
 
 @Component({
   selector: 'app-students',
-  imports: [CommonModule],
+  imports: [CommonModule, StudentDataComponent, StudentStatsComponent],
   templateUrl: './students.html',
   styleUrl: './students.css',
 })
 export class Students implements OnInit {
-  students: {
-    username: string;
-    email: string;
-    quizzesTaken: number;
-    avgScore: number;
-    passRate: number;
-    joined: string;
-  }[] = [];
+  students: StudentData[] = [];
 
   constructor(
     private userService: UserService,
@@ -51,8 +47,11 @@ export class Students implements OnInit {
     this.students = students.map((student: any) => {
       const stats = this.attemptService.getUserStats(student.username);
       return {
+        id: student.id,
         username: student.username,
+        fullName: student.fullName || student.username,
         email: student.email,
+        role: student.role,
         quizzesTaken: stats.quizzesTaken,
         avgScore: stats.avgScore,
         passRate: stats.passRate,

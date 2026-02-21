@@ -15,106 +15,21 @@
         </div>
     </header>
 
-    <!-- Students Table -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="border-b border-gray-100">
-                        <th class="px-8 py-6 text-sm font-semibold text-gray-400 uppercase tracking-wider">Name</th>
-                        <th class="px-8 py-6 text-sm font-semibold text-gray-400 uppercase tracking-wider">Email</th>
-                        <th class="px-8 py-6 text-sm font-semibold text-gray-400 uppercase tracking-wider">Quizzes Taken
-                        </th>
-                        <th class="px-8 py-6 text-sm font-semibold text-gray-400 uppercase tracking-wider">Avg Score
-                        </th>
-                        <th class="px-8 py-6 text-sm font-semibold text-gray-400 uppercase tracking-wider">Pass Rate
-                        </th>
-                        <th class="px-8 py-6 text-sm font-semibold text-gray-400 uppercase tracking-wider">Joined</th>
-                        <th class="px-8 py-6 text-sm font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let student of students; let i = index"
-                        class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                        <td class="px-8 py-6">
-                            <span class="font-semibold text-gray-800 text-lg">{{ student.username }}</span>
-                        </td>
-                        <td class="px-8 py-6 text-gray-500 text-base">{{ student.email }}</td>
-                        <td class="px-8 py-6 text-gray-700 font-medium text-base">{{ student.quizzesTaken }}</td>
-                        <td class="px-8 py-6">
-                            <span class="px-4 py-2 rounded-full text-sm font-bold" [ngClass]="{
-                      'bg-emerald-100 text-emerald-700': student.avgScore >= 70,
-                      'bg-amber-100 text-amber-700': student.avgScore >= 40 && student.avgScore < 70,
-                      'bg-red-100 text-red-700': student.avgScore < 40
-                    }">
-                                {{ student.avgScore }}%
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 text-gray-700 font-medium text-base">{{ student.passRate }}%</td>
-                        <td class="px-8 py-6 text-gray-400 text-base">{{ student.joined }}</td>
-                        <td class="px-8 py-6">
-                            <button (click)="viewStudentDetails(student)"
-                                class="text-gray-400 hover:text-emerald-600 transition-colors p-2 rounded-lg hover:bg-emerald-50"
-                                title="View Details">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </button>
-                        </td>
-                    </tr>
+    <!-- Student Data Component -->
+    <section class="my-8">
+        <app-student-data 
+            [students]="students" 
+            (viewDetails)="viewStudentDetails($event)">
+        </app-student-data>
+    </section>
 
-                    <!-- Empty State -->
-                    <tr *ngIf="students.length === 0">
-                        <td colspan="7" class="px-8 py-16 text-center">
-                            <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
-                            <p class="text-gray-400 font-medium text-lg">No students registered yet</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Top Performer -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 hover:shadow-md transition-shadow">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Top Performer</p>
-            <p class="text-2xl font-bold text-gray-800">
-                <ng-container *ngIf="topPerformer">
-                    {{ topPerformer.username }} ({{ topPerformer.avgScore }}%)
-                </ng-container>
-                <ng-container *ngIf="!topPerformer">
-                    <span class="text-gray-300">—</span>
-                </ng-container>
-            </p>
-        </div>
-
-        <!-- Most Active -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 hover:shadow-md transition-shadow">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Most Active</p>
-            <p class="text-2xl font-bold text-gray-800">
-                <ng-container *ngIf="mostActive">
-                    {{ mostActive.username }} ({{ mostActive.quizzesTaken }} quizzes)
-                </ng-container>
-                <ng-container *ngIf="!mostActive">
-                    <span class="text-gray-300">—</span>
-                </ng-container>
-            </p>
-        </div>
-
-        <!-- Overall Pass Rate -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 hover:shadow-md transition-shadow">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Overall Pass Rate</p>
-            <p class="text-2xl font-bold text-gray-800">{{ overallPassRate }}%</p>
-        </div>
-    </div>
+    <!-- Student Stats Component -->
+    <section class="my-8">
+        <app-student-stats 
+            [topPerformer]="topPerformer" 
+            [mostActive]="mostActive" 
+            [overallPassRate]="overallPassRate">
+        </app-student-stats>
+    </section>
 
 </div>

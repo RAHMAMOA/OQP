@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StatsCardsComponent } from './stats-cards/stats-cards.component';
+import { StatsCardsComponent } from '../../../shared/components/stats-cards/stats-cards.component';
+import { StatCard } from '../../../core/models/stat-card';
 import { QuickActionsComponent } from './quick-actions/quick-actions.component';
 import { RecentAttemptsComponent } from './recent-attempts/recent-attempts.component';
 import { QuizService } from '../../../core/services/quiz.service';
@@ -9,6 +10,7 @@ import { AttemptService } from '../../../core/services/result.service';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { User } from '../../../core/models/user';
+import { TruncatePipe } from '../../../shared/pipes';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,13 +19,14 @@ import { User } from '../../../core/models/user';
     CommonModule,
     StatsCardsComponent,
     QuickActionsComponent,
-    RecentAttemptsComponent
+    RecentAttemptsComponent,
+    TruncatePipe
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
-  stats$: Observable<any[]>;
+  stats$: Observable<StatCard[]>;
   quickActions = [
     { label: 'Manage Quizzes', path: '/admin/quizzes', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', color: 'text-emerald-600' },
     { label: 'View Students', path: '/admin/students', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', color: 'text-emerald-500' },
@@ -45,7 +48,7 @@ export class DashboardComponent {
     this.recentAttempts$ = this.getRecentAttempts();
   }
 
-  calculateStats(): Observable<any[]> {
+  calculateStats(): Observable<StatCard[]> {
     return combineLatest([
       this.quizService.getQuizzes(),
       new Observable<User[]>(subscriber => {
@@ -59,17 +62,37 @@ export class DashboardComponent {
         const totalAttempts = allAttempts.length;
 
         const totalScore = allAttempts.reduce((sum: number, attempt: any) => {
-          const score = parseInt(attempt.score) || 0;
+          const score = parseFloat(attempt.percentage) || 0;
           return sum + score;
         }, 0);
         const avgScore = totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0;
 
         return [
-          { label: 'Total Students', value: students.length.toString(), icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', color: 'bg-emerald-50 text-emerald-600' },
-          { label: 'Total Quizzes', value: quizzes.length.toString(), icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', color: 'bg-amber-50 text-amber-600' },
-          { label: 'Total Attempts', value: totalAttempts.toString(), icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', color: 'bg-green-50 text-green-600' },
-          { label: 'Avg Score', value: `${avgScore}%`, icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6', color: 'bg-orange-50 text-orange-600' }
-        ];
+          {
+            label: 'Total Students',
+            value: students.length.toString(),
+            icon: 'users',
+            color: 'bg-emerald-50 text-emerald-500 border-emerald-200'
+          },
+          {
+            label: 'Total Quizzes',
+            value: quizzes.length.toString(),
+            icon: 'quiz',
+            color: 'bg-amber-50 text-amber-500 border-amber-200'
+          },
+          {
+            label: 'Total Attempts',
+            value: totalAttempts.toString(),
+            icon: 'attempts',
+            color: 'bg-blue-50 text-blue-500 border-blue-200'
+          },
+          {
+            label: 'Avg Score',
+            value: `${avgScore}%`,
+            icon: 'trending-up',
+            color: 'bg-purple-50 text-purple-500 border-purple-200'
+          }
+        ] as StatCard[];
       })
     );
   }
@@ -79,8 +102,7 @@ export class DashboardComponent {
       map(allAttempts => {
         // Sort by date and get latest 5
         return allAttempts
-          .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-          .slice(0, 5);
+          .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
       })
     );
   }

@@ -6,20 +6,23 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { AttemptService } from '../../../../core/services/result.service';
 import { QuizService } from '../../../../core/services/quiz.service';
 import { SettingsService } from '../../../../core/services/settings.service';
+import { QuizAttempt } from '../../../../core/models/answer';
+import { User } from '../../../../core/models/user';
 import { Attempt } from '../../../../core/models/attempet';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { FormatDatePipe, StatusPipe } from '../../../../shared/pipes';
 
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormatDatePipe, StatusPipe],
   templateUrl: './history.html',
   styleUrl: './history.css',
 })
 export class History implements OnInit {
   brandName = 'OQP';
-  user = { name: '', role: 'student' };
+  user: User = { id: '', username: '', fullName: '', email: '', role: 'student' };
   attempts: Attempt[] = [];
   showCorrectAnswers = false;
   allowRetakes = false;
@@ -36,7 +39,7 @@ export class History implements OnInit {
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
-      this.user.name = currentUser.username;
+      this.user.fullName = currentUser.username;
 
       // Load settings
       this.settingsService.getSettings$()
@@ -50,8 +53,45 @@ export class History implements OnInit {
       this.attemptService.getAttempts().pipe(
         takeUntil(this.destroy$)
       ).subscribe(allAttempts => {
-        this.attempts = allAttempts.filter(attempt => attempt.user === currentUser.username);
-        console.log('History - User attempts:', this.attempts);
+        // Get quizzes to map quizId to quizName
+        this.quizService.getQuizzes().subscribe(quizzes => {
+          const quizMap = new Map(quizzes.map(q => [q.id, q.title]));
+
+          // Transform QuizAttempt[] to display format
+          this.attempts = allAttempts
+            .filter(attempt => attempt.userId === currentUser.username || (attempt as any).user === currentUser.username)
+            .map(attempt => {
+              // Handle percentage which might be a string (e.g. "80%") in legacy data
+              let numericScore = 0;
+              if (attempt.percentage !== undefined && attempt.percentage !== null) {
+                numericScore = Number(attempt.percentage.toString().replace(/[^0-9.-]/g, '')) || 0;
+              }
+
+              const isPassed = numericScore >= 50;
+
+              // Handle maxScore and totalScore which might be missing in legacy data
+              // If we have answers array, we can use its length
+              const maxScore = attempt.maxScore || (attempt.answers ? attempt.answers.length : 10);
+              const totalScore = attempt.totalScore !== undefined ? attempt.totalScore : Math.round((numericScore / 100) * maxScore);
+
+              return {
+                id: attempt.id,
+                quizId: attempt.quizId,
+                quizName: quizMap.get(attempt.quizId) || `Quiz ${attempt.quizId}`,
+                user: attempt.userId || (attempt as any).user,
+                date: new Date(attempt.endTime || attempt.startTime || new Date()).toISOString(),
+                score: Math.round(numericScore).toString(),
+                status: numericScore >= 50 ? 'Passed' : 'Failed',
+                correctAnswers: totalScore,
+                wrongAnswers: maxScore - totalScore,
+                totalQuestions: maxScore,
+                selectedAnswers: attempt.answers ? attempt.answers.reduce((acc, answer) => {
+                  acc[answer.questionId] = answer.selectedAnswer;
+                  return acc;
+                }, {} as { [key: string]: any }) : {}
+              };
+            });
+        });
       });
     }
   }
@@ -80,16 +120,6 @@ export class History implements OnInit {
     return 'bg-red-100 text-red-600';
   }
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
 
   onLogout(): void {
     this.authService.logout();
@@ -114,8 +144,8 @@ export class History implements OnInit {
     if (!currentUser) return false;
 
     const userAttempts = this.attemptService.getAttemptsByUser(currentUser.username);
-    const quizAttempts = userAttempts.filter(a => a.quizId === attempt.quizId);
+    const quizAttempts = userAttempts.filter(a => a.quizId === attempt.quizId && (a.userId === currentUser.username || (a as any).user === currentUser.username));
 
-    return quizAttempts.length > 0; // Only show retake if they've taken it before
+    return quizAttempts.length >= 1; // Show retake if they've taken it before
   }
 }

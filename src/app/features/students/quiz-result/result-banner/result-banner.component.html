@@ -1,0 +1,10 @@
+<!-- Result Banner -->
+<div class="px-8 py-6 text-center" [class]="getBannerClass()">
+  <div class="flex items-center justify-center space-x-3 mb-2">
+    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+    </svg>
+    <h2 class="text-2xl font-bold text-white">{{ getBannerTitle() }}</h2>
+  </div>
+  <p class="text-white text-lg">{{ quizName || 'Quiz' }}</p>
+</div>

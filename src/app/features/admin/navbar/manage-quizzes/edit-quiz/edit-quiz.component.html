@@ -56,10 +56,7 @@
             <span class="w-2 h-2 rounded-full bg-blue-500"></span>
             <span>True / False</span>
           </button>
-          <button (click)="addQuestion('fill-blank')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span>Fill in the Blank</span>
-          </button>
+          <!-- Removed Fill in the Blank option -->
           <button (click)="addQuestion('essay')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
             <span class="w-2 h-2 rounded-full bg-purple-500"></span>
             <span>Essay</span>
@@ -69,52 +66,29 @@
     </div>
 
     <!-- Questions List -->
-    <div class="space-y-4">
+    <div class="space-y-6">
       <div *ngFor="let question of questions; let i = index" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div class="flex items-start justify-between mb-4">
+        <div class="flex justify-between items-start mb-4">
           <div class="flex items-center space-x-3">
             <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-sm font-bold text-emerald-600">
               {{ i + 1 }}
             </div>
             <span class="text-sm font-semibold text-gray-500 uppercase tracking-wider">
-              {{ question.type === 'mcq' ? 'Multiple Choice' : 'True/False' }}
+              {{ question.type === 'mcq' ? 'Multiple Choice' : 
+                 question.type === 'true-false' ? 'True/False' : 'Essay' }}
             </span>
           </div>
-          <button (click)="removeQuestion(i)" class="text-red-500 hover:text-red-700 transition-colors">
+          <button (click)="removeQuestion(i)" class="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
             </svg>
           </button>
         </div>
-
-        <!-- Question Text -->
-        <div class="mb-4">
-          <input type="text" [(ngModel)]="question.text" placeholder="Enter your question here..." 
-                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none">
-        </div>
-
-        <!-- MCQ Options -->
-        <div *ngIf="question.type === 'mcq'" class="space-y-2">
-          <div *ngFor="let option of question.options; let j = index" class="flex items-center space-x-3">
-            <span class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-gray-600">
-              {{ String.fromCharCode(65 + j) }}
-            </span>
-            <input type="text" [(ngModel)]="question.options![j]" placeholder="Option {{ String.fromCharCode(65 + j) }}" 
-                   class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-50 transition-all outline-none">
-          </div>
-        </div>
-
-        <!-- True/False Options -->
-        <div *ngIf="question.type === 'true-false'" class="flex space-x-4">
-          <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="radio" [name]="'correct-' + question.id" [value]="true" [(ngModel)]="question.correctAnswer" class="w-4 h-4 text-emerald-500">
-            <span class="px-4 py-2 bg-gray-50 rounded-lg font-medium">True</span>
-          </label>
-          <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="radio" [name]="'correct-' + question.id" [value]="false" [(ngModel)]="question.correctAnswer" class="w-4 h-4 text-emerald-500">
-            <span class="px-4 py-2 bg-gray-50 rounded-lg font-medium">False</span>
-          </label>
-        </div>
+        <app-edit-question [question]="question"
+                          [questionIndex]="i"
+                          (questionChange)="updateQuestion(i, $event)"
+                          (remove)="removeQuestion(i)">
+        </app-edit-question>
       </div>
     </div>
   </div>

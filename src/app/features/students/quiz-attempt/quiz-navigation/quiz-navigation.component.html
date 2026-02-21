@@ -1,0 +1,20 @@
+<!-- Navigation Buttons -->
+<div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+  <button (click)="onExitQuiz()" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+    Exit Quiz
+  </button>
+  
+  <div class="flex space-x-4">
+    <button *ngIf="!isLastQuestion()" 
+            (click)="onNextQuestion()"
+            class="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors">
+      Next
+    </button>
+    
+    <button *ngIf="isLastQuestion()" 
+            (click)="onSubmitQuiz()"
+            class="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors">
+      Submit Quiz
+    </button>
+  </div>
+</div>

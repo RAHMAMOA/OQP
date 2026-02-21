@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PlatformSettings } from '../models/settings';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,18 +13,20 @@ export class SettingsService {
     welcomeMessage: 'Ready to challenge yourself? Pick a quiz below.',
     passingScore: 50,
     maxAttempts: 0,
-    allowRetakes: false,
+    allowRetakes: true,
     showCorrectAnswers: false
   };
   private settingsSubject = new BehaviorSubject<PlatformSettings>(this.defaultSettings);
 
-  constructor() {
+  constructor(
+    private storageService: StorageService
+  ) {
     this.initializeDefaultSettings();
   }
 
   private initializeDefaultSettings() {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    const settings = stored ? { ...this.defaultSettings, ...JSON.parse(stored) } : this.defaultSettings;
+    const stored = this.storageService.getItem<Partial<PlatformSettings>>(this.STORAGE_KEY);
+    const settings = stored ? { ...this.defaultSettings, ...stored } : this.defaultSettings;
     this.settingsSubject.next(settings);
     if (!stored) {
       this.saveSettings(this.defaultSettings);
@@ -35,14 +38,14 @@ export class SettingsService {
   }
 
   getSettings(): PlatformSettings {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    return stored ? { ...this.defaultSettings, ...JSON.parse(stored) } : this.defaultSettings;
+    const stored = this.storageService.getItem<Partial<PlatformSettings>>(this.STORAGE_KEY);
+    return stored ? { ...this.defaultSettings, ...stored } : this.defaultSettings;
   }
 
   saveSettings(settings: Partial<PlatformSettings>): void {
     const currentSettings = this.getSettings();
     const updatedSettings = { ...currentSettings, ...settings };
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedSettings));
+    this.storageService.setItem(this.STORAGE_KEY, updatedSettings);
     this.settingsSubject.next(updatedSettings);
   }
 

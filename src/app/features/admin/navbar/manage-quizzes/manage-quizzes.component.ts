@@ -5,6 +5,7 @@ import { QuizService } from '../../../../core/services/quiz.service';
 
 @Component({
   selector: 'app-manage-quizzes',
+  standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './manage-quizzes.component.html',
   styleUrl: './manage-quizzes.component.css'

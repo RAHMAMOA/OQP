@@ -7,4 +7,5 @@ export interface Question {
     points: number;
     options?: string[];
     correctAnswer?: string | number | boolean;
+    blanks?: string[]; // For fill-in-the-blank questions
 }

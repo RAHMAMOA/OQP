@@ -1,0 +1,34 @@
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <!-- Top Performer -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Top Performer</p>
+        <p class="text-lg font-bold text-gray-800">
+            <ng-container *ngIf="topPerformer">
+                {{ topPerformer.username }} ({{ topPerformer.avgScore }}%)
+            </ng-container>
+            <ng-container *ngIf="!topPerformer">
+                <span class="text-gray-300">—</span>
+            </ng-container>
+        </p>
+    </div>
+
+    <!-- Most Active -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Most Active</p>
+        <p class="text-lg font-bold text-gray-800">
+            <ng-container *ngIf="mostActive">
+                {{ mostActive.username }} ({{ mostActive.quizzesTaken }} quizzes)
+            </ng-container>
+            <ng-container *ngIf="!mostActive">
+                <span class="text-gray-300">—</span>
+            </ng-container>
+        </p>
+    </div>
+
+    <!-- Overall Pass Rate -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Overall Pass Rate</p>
+        <p class="text-lg font-bold text-gray-800">{{ overallPassRate }}%</p>
+    </div>
+</div>

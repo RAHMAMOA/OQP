@@ -1,0 +1,40 @@
+<!-- Score Cards -->
+<div class="p-8">
+  <div class="grid grid-cols-2 gap-4 mb-8" *ngIf="!showCorrectAnswers">
+    <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
+      <div class="text-2xl font-bold text-gray-900">{{ score }}%</div>
+      <div class="text-sm text-gray-500">Score</div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
+      <div class="text-2xl font-bold text-gray-900">{{ totalQuestions }}</div>
+      <div class="text-sm text-gray-500">Questions</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-4 gap-4 mb-8" *ngIf="showCorrectAnswers">
+    <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
+      <div class="text-2xl font-bold text-gray-900">{{ score }}%</div>
+      <div class="text-sm text-gray-500">Score</div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
+      <div class="text-2xl font-bold text-gray-900">{{ correct }}</div>
+      <div class="text-sm text-gray-500">Correct</div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
+      <div class="text-2xl font-bold text-gray-900">{{ wrong }}</div>
+      <div class="text-sm text-gray-500">Wrong</div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
+      <div class="text-2xl font-bold text-gray-900">{{ totalQuestions }}</div>
+      <div class="text-sm text-gray-500">Total</div>
+    </div>
+  </div>
+
+  <!-- Status Banner -->
+  <div class="px-6 py-4 rounded-xl text-center mb-8"
+       [class]="passed ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'">
+    <div class="text-lg font-bold">
+      {{ getBannerMessage() }}
+    </div>
+  </div>
+</div>

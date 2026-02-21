@@ -8,27 +8,81 @@
     <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Create New Quiz</h1>
   </div>
 
+  <!-- Validation Errors -->
+  <div *ngIf="validationErrors.length > 0" class="bg-red-50 border border-red-200 rounded-xl p-4">
+    <div class="flex items-start space-x-3">
+      <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+      </svg>
+      <div>
+        <h3 class="font-medium text-red-900 mb-1">Please fix the following errors:</h3>
+        <ul class="text-sm text-red-700 space-y-1">
+          <li *ngFor="let error of validationErrors">{{ error }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
   <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6">
-    <!-- Quiz Title -->
-    <div>
-      <label class="block text-sm font-bold text-gray-700 mb-2">Quiz Title</label>
-      <input type="text" [(ngModel)]="quizTitle" placeholder="e.g. Angular Basics" 
-             class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none">
-    </div>
+    <form [formGroup]="quizForm">
+      <!-- Quiz Title -->
+      <div>
+        <label for="title" class="block text-sm font-bold text-gray-700 mb-2">Quiz Title</label>
+        <input 
+          type="text" 
+          id="title"
+          formControlName="title"
+          placeholder="e.g. Angular Basics" 
+          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
+          [class.border-red-300]="titleControl?.invalid && titleControl?.touched"
+          [class.focus:border-red-500]="titleControl?.invalid && titleControl?.touched">
+        
+        <!-- Validation Error -->
+        <div *ngIf="titleControl?.invalid && titleControl?.touched" class="mt-2 text-sm text-red-600">
+          <div *ngIf="titleControl?.errors?.['required']">Quiz title is required</div>
+          <div *ngIf="titleControl?.errors?.['minlength']">Quiz title must be at least 3 characters long</div>
+        </div>
+      </div>
 
-    <!-- Description -->
-    <div>
-      <label class="block text-sm font-bold text-gray-700 mb-2">Description</label>
-      <textarea [(ngModel)]="quizDescription" rows="3" placeholder="Brief description..." 
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none resize-none"></textarea>
-    </div>
+      <!-- Description -->
+      <div>
+        <label for="description" class="block text-sm font-bold text-gray-700 mb-2">Description</label>
+        <textarea 
+          id="description"
+          formControlName="description"
+          rows="3" 
+          placeholder="Brief description..." 
+          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none resize-none"
+          [class.border-red-300]="descriptionControl?.invalid && descriptionControl?.touched"
+          [class.focus:border-red-500]="descriptionControl?.invalid && descriptionControl?.touched"></textarea>
+        
+        <!-- Validation Error -->
+        <div *ngIf="descriptionControl?.invalid && descriptionControl?.touched" class="mt-2 text-sm text-red-600">
+          <div *ngIf="descriptionControl?.errors?.['required']">Quiz description is required</div>
+          <div *ngIf="descriptionControl?.errors?.['minlength']">Quiz description must be at least 10 characters long</div>
+        </div>
+      </div>
 
-    <!-- Time Limit -->
-    <div>
-      <label class="block text-sm font-bold text-gray-700 mb-2">Time Limit (minutes)</label>
-      <input type="number" [(ngModel)]="quizTime" placeholder="e.g. 10" 
-             class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none">
-    </div>
+      <!-- Time Limit -->
+      <div>
+        <label for="timeLimit" class="block text-sm font-bold text-gray-700 mb-2">Time Limit (minutes)</label>
+        <input 
+          type="number" 
+          id="timeLimit"
+          formControlName="timeLimit"
+          placeholder="e.g. 10" 
+          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
+          [class.border-red-300]="timeLimitControl?.invalid && timeLimitControl?.touched"
+          [class.focus:border-red-500]="timeLimitControl?.invalid && timeLimitControl?.touched">
+        
+        <!-- Validation Error -->
+        <div *ngIf="timeLimitControl?.invalid && timeLimitControl?.touched" class="mt-2 text-sm text-red-600">
+          <div *ngIf="timeLimitControl?.errors?.['required']">Time limit is required</div>
+          <div *ngIf="timeLimitControl?.errors?.['min']">Time limit must be at least 1 minute</div>
+          <div *ngIf="timeLimitControl?.errors?.['max']">Time limit cannot exceed 180 minutes</div>
+        </div>
+      </div>
+    </form>
   </div>
 
   <!-- Questions Section -->
@@ -37,7 +91,7 @@
       <h2 class="text-xl font-bold text-gray-900">Questions ({{ questions.length }})</h2>
       
       <div class="relative group">
-        <button (click)="isDropdownOpen = !isDropdownOpen" 
+        <button (click)="debugLog('Dropdown toggled'); isDropdownOpen = !isDropdownOpen" 
                 class="bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm flex items-center space-x-2">
           <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -48,19 +102,16 @@
         <!-- Dropdown Menu -->
         <div *ngIf="isDropdownOpen" 
              class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-10 animate-fade-in-down">
-          <button (click)="addQuestion('mcq')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
+          <button (click)="debugLog('MCQ clicked'); addQuestion('mcq'); isDropdownOpen = false" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>Multiple Choice</span>
           </button>
-          <button (click)="addQuestion('true-false')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
+          <button (click)="debugLog('True/False clicked'); addQuestion('true-false'); isDropdownOpen = false" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
             <span class="w-2 h-2 rounded-full bg-blue-500"></span>
             <span>True / False</span>
           </button>
-          <button (click)="addQuestion('fill-blank')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span>Fill in the Blank</span>
-          </button>
-          <button (click)="addQuestion('essay')" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
+          <!-- Removed Fill in the Blank option -->
+          <button (click)="debugLog('Essay clicked'); addQuestion('essay'); isDropdownOpen = false" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
             <span class="w-2 h-2 rounded-full bg-purple-500"></span>
             <span>Essay</span>
           </button>
@@ -69,97 +120,54 @@
     </div>
 
     <!-- Questions List -->
-    <div *ngFor="let warning of 'No questions yet. Click Add Question to begin.' | i18nSelect: { other: '' }; let i = index">
-      <div *ngIf="questions.length === 0" class="text-center py-10 text-gray-400 font-medium bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-        {{ warning }}
+    <div class="space-y-6">
+      <div *ngFor="let warning of 'No questions yet. Click Add Question to begin.' | i18nSelect: { other: '' }; let i = index">
+        <div *ngIf="questions.length === 0" class="text-center py-10 text-gray-400 font-medium bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+          {{ warning }}
+        </div>
+      </div>
+
+      <div *ngFor="let question of questions; let i = index" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div class="flex justify-between items-start mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-sm font-bold text-emerald-600">
+              {{ i + 1 }}
+            </div>
+            <span class="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+              {{ question.type === 'mcq' ? 'Multiple Choice' : 
+                 question.type === 'true-false' ? 'True/False' : 'Essay' }}
+            </span>
+          </div>
+          <button (click)="removeQuestion(i)" class="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </button>
+        </div>
+        <app-question [question]="question"
+                      [questionIndex]="i"
+                      (questionChange)="updateQuestion(i, $event)"
+                      (remove)="removeQuestion(i)">
+        </app-question>
       </div>
     </div>
 
-    <div *ngFor="let question of questions; let i = index" class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6">
-      <div class="flex justify-between items-start">
-        <h3 class="text-lg font-bold text-gray-900">Question {{ i + 1 }}</h3>
-        <button (click)="removeQuestion(i)" class="text-red-400 hover:text-red-600 p-1 rounded-lg hover:bg-red-50 transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Question Text -->
-      <input type="text" [(ngModel)]="question.text" placeholder="Enter question..." 
-             class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none bg-gray-50/50">
-
-      <!-- Question Type Specific Content -->
-      <ng-container [ngSwitch]="question.type">
-        
-        <!-- Multiple Choice -->
-        <div *ngSwitchCase="'mcq'" class="space-y-3 pl-4 border-l-2 border-emerald-100">
-          <div *ngFor="let option of [0, 1, 2, 3]; let optIndex = index" class="flex items-center space-x-3">
-             <div class="relative flex items-center justify-center w-6 h-6">
-                <input type="radio" 
-                       [name]="'correct-' + i" 
-                       [checked]="question.correctAnswer === optIndex"
-                       (change)="question.correctAnswer = optIndex"
-                       class="peer appearance-none w-5 h-5 rounded-full border-2 border-gray-300 checked:border-emerald-500 checked:bg-emerald-500 transition-all cursor-pointer z-10">
-                <div class="absolute w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100 pointer-events-none z-20"></div>
-             </div>
-             <input type="text" 
-                    [placeholder]="'Option ' + (optIndex + 1 | i18nPlural: {'=0': 'A', '=1': 'B', '=2': 'C', '=3': 'D'})"
-                    [(ngModel)]="question.options![optIndex]"
-                    class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 transition-all outline-none text-sm">
-          </div>
-          <p class="text-xs text-gray-400 mt-2 ml-9">Select the radio button next to the correct answer</p>
-        </div>
-
-        <!-- True / False -->
-        <div *ngSwitchCase="'true-false'" class="flex space-x-6 pl-4 border-l-2 border-blue-100">
-          <label class="flex items-center space-x-2 cursor-pointer group">
-            <div class="relative flex items-center justify-center w-5 h-5">
-                <input type="radio" [name]="'tf-' + i" [value]="true" [(ngModel)]="question.correctAnswer"
-                       class="peer appearance-none w-5 h-5 rounded-full border-2 border-gray-300 checked:border-blue-500 checked:bg-blue-500 transition-all">
-                 <div class="absolute w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
-            </div>
-            <span class="font-medium text-gray-700 group-hover:text-blue-600 transition-colors">True</span>
-          </label>
-          <label class="flex items-center space-x-2 cursor-pointer group">
-            <div class="relative flex items-center justify-center w-5 h-5">
-                <input type="radio" [name]="'tf-' + i" [value]="false" [(ngModel)]="question.correctAnswer"
-                       class="peer appearance-none w-5 h-5 rounded-full border-2 border-gray-300 checked:border-blue-500 checked:bg-blue-500 transition-all">
-                 <div class="absolute w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
-            </div>
-            <span class="font-medium text-gray-700 group-hover:text-blue-600 transition-colors">False</span>
-          </label>
-        </div>
-
-        <!-- Fill in the blank -->
-        <div *ngSwitchCase="'fill-blank'" class="pl-4 border-l-2 border-amber-100">
-           <input type="text" [(ngModel)]="question.correctAnswer" placeholder="Enter the correct answer..." 
-                  class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-amber-500 focus:ring-4 focus:ring-amber-50 transition-all outline-none text-sm">
-        </div>
-
-        <!-- Essay -->
-        <div *ngSwitchCase="'essay'" class="pl-4 border-l-2 border-purple-100">
-           <p class="text-sm text-gray-500 italic">Essay questions are manually graded.</p>
-        </div>
-
-      </ng-container>
-
-      <div class="pt-4 border-t border-gray-100 flex justify-end">
-          <div class="flex items-center space-x-2">
-             <span class="text-sm font-bold text-gray-500">Points:</span>
-             <input type="number" [(ngModel)]="question.points" min="1" class="w-20 px-3 py-1 rounded-lg border border-gray-200 focus:border-emerald-500 text-center font-bold text-gray-700 outline-none">
-          </div>
-      </div>
+    <div class="flex items-center space-x-4 pt-4">
+      <button 
+        (click)="saveQuiz()" 
+        [disabled]="quizForm.invalid || isSaving || questions.length === 0"
+        class="bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md shadow-emerald-200 flex items-center space-x-2">
+        <svg *ngIf="!isSaving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+        </svg>
+        <svg *ngIf="isSaving" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span *ngIf="!isSaving">Save Quiz</span>
+        <span *ngIf="isSaving">Saving...</span>
+      </button>
+      <button routerLink="/admin/quizzes" class="text-gray-500 hover:text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition-all">Cancel</button>
     </div>
-  </div>
-
-  <div class="flex items-center space-x-4 pt-4">
-    <button (click)="saveQuiz()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md shadow-emerald-200 flex items-center space-x-2">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-      </svg>
-      <span>Save Quiz</span>
-    </button>
-    <button routerLink="/admin/quizzes" class="text-gray-500 hover:text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition-all">Cancel</button>
   </div>
 </div>

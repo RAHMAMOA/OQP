@@ -7,7 +7,7 @@ import { DashboardComponent as StudentDashboardComponent } from './features/stud
 import { History } from './features/students/navbar/history/history';
 import { Profile } from './features/students/navbar/profile/profile';
 import { ManageQuizzesComponent } from './features/admin/navbar/manage-quizzes/manage-quizzes.component';
-import { Students as AdminStudentsComponent } from './features/admin/students/students';
+import { Students as AdminStudentsComponent } from './features/admin/navbar/students/students';
 import { SettingsComponent as AdminSettingsComponent } from './features/admin/navbar/settings/settings.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
