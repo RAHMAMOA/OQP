@@ -6,6 +6,7 @@ import { QuizService } from '../../../core/services/quiz.service';
 import { AnswerService } from '../../../core/services/answer.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AntiCheatService, SecurityEvent } from '../../../core/services/anti-cheat.service';
 import { Quiz } from '../../../core/models/quiz';
 import { Question } from '../../../core/models/question';
 import { QuizAttempt } from '../../../core/models/answer';
@@ -36,13 +37,19 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
   maxAttempts = 0;
   allowRetakes = false;
 
+  // Security properties
+  securityEvents: SecurityEvent[] = [];
+  securityWarning = '';
+  showSecurityWarning = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private quizService: QuizService,
     private answerService: AnswerService,
     private settingsService: SettingsService,
-    private authService: AuthService
+    private authService: AuthService,
+    private antiCheatService: AntiCheatService
   ) { }
 
   ngOnInit() {
@@ -55,6 +62,33 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
         this.passingScore = settings.passingScore || 50;
         this.maxAttempts = settings.maxAttempts || 0;
         this.allowRetakes = settings.allowRetakes || false;
+
+        // Setup security monitoring with settings
+        if (settings.securitySettings) {
+          this.antiCheatService.updateSettings(settings.securitySettings);
+        }
+      });
+
+    // Setup security event monitoring
+    this.antiCheatService.getSecurityEvents()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(events => {
+        this.securityEvents = events;
+
+        // Check for auto-submit condition
+        const latestEvent = events[events.length - 1];
+        if (latestEvent?.details?.autoSubmit) {
+          this.handleSecurityViolation('Maximum security violations reached. Quiz will be submitted automatically.');
+          this.submitQuiz();
+        } else if (events.length > 0) {
+          const violationCount = this.antiCheatService.getViolationCount();
+          const settings = this.antiCheatService.getCurrentSettings();
+          const remaining = settings.maxViolations - violationCount;
+
+          if (remaining > 0) {
+            this.handleSecurityViolation(`Security violation detected! ${remaining} more violations will result in automatic submission.`);
+          }
+        }
       });
 
     if (quizId) {
@@ -110,6 +144,9 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
         const maxScore = this.questions.reduce((sum, q) => sum + q.points, 0);
         this.currentAttempt = this.answerService.startQuizAttempt(quizId, maxScore);
 
+        // Start security monitoring
+        this.antiCheatService.startMonitoring();
+
         this.startTimer();
       }
       this.isLoading = false;
@@ -156,7 +193,11 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
         break;
     }
 
-    this.answerService.addAnswer(question, selectedAnswer, textAnswer);
+    try {
+      this.answerService.addAnswer(question, selectedAnswer, textAnswer);
+    } catch (error) {
+      console.warn('Cannot add answer:', error);
+    }
   }
 
   onAnswerSelected(event: { questionIndex: number; answer: any }) {
@@ -186,8 +227,21 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
     return this.quiz.questions[this.currentQuestionIndex];
   }
 
+  handleSecurityViolation(message: string) {
+    this.securityWarning = message;
+    this.showSecurityWarning = true;
+
+    // Auto-hide warning after 5 seconds
+    setTimeout(() => {
+      this.showSecurityWarning = false;
+    }, 5000);
+  }
+
   submitQuiz() {
     console.log('Submit quiz called');
+
+    // Stop security monitoring
+    this.antiCheatService.stopMonitoring();
 
     if (this.timer) {
       clearInterval(this.timer);
@@ -222,6 +276,10 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
     if (this.timer) {
       clearInterval(this.timer);
     }
+
+    // Stop security monitoring
+    this.antiCheatService.stopMonitoring();
+
     this.destroy$.next();
     this.destroy$.complete();
   }

@@ -1,0 +1,121 @@
+<div class="space-y-6">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <h2 class="text-xl font-semibold text-gray-900 mb-6">Browser Security Settings</h2>
+    
+    <!-- Security Options -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Prevent Tab Switching</label>
+          <p class="text-sm text-gray-500">Detects when students switch tabs or minimize the window</p>
+        </div>
+        <input type="checkbox" 
+               [(ngModel)]="securitySettings.preventTabSwitching"
+               class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Prevent Copy/Paste</label>
+          <p class="text-sm text-gray-500">Blocks copy, paste, and cut operations during quiz</p>
+        </div>
+        <input type="checkbox" 
+               [(ngModel)]="securitySettings.preventCopyPaste"
+               class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Prevent Right-Click</label>
+          <p class="text-sm text-gray-500">Disables right-click context menu</p>
+        </div>
+        <input type="checkbox" 
+               [(ngModel)]="securitySettings.preventRightClick"
+               class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Prevent Keyboard Shortcuts</label>
+          <p class="text-sm text-gray-500">Blocks F12, Ctrl+Shift+I, Ctrl+U and other shortcuts</p>
+        </div>
+        <input type="checkbox" 
+               [(ngModel)]="securitySettings.preventKeyboardShortcuts"
+               class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Detect Developer Tools</label>
+          <p class="text-sm text-gray-500">Detects when browser developer tools are opened</p>
+        </div>
+        <input type="checkbox" 
+               [(ngModel)]="securitySettings.detectDevTools"
+               class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
+      </div>
+    </div>
+
+    <!-- Violation Settings -->
+    <div class="mt-8 pt-6 border-t border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Violation Handling</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Maximum Violations
+          </label>
+          <input type="number" 
+                 [(ngModel)]="securitySettings.maxViolations"
+                 min="1" max="10"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <p class="mt-1 text-sm text-gray-500">Number of violations before action</p>
+        </div>
+
+        <div class="flex items-center justify-between pt-6">
+          <div>
+            <label class="text-sm font-medium text-gray-700">Auto-Submit on Max Violations</label>
+            <p class="text-sm text-gray-500">Automatically submit quiz when limit reached</p>
+          </div>
+          <input type="checkbox" 
+                 [(ngModel)]="securitySettings.autoSubmitOnViolation"
+                 class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
+        </div>
+      </div>
+    </div>
+
+    <!-- Save Status -->
+    <div *ngIf="saveStatus" 
+         class="mt-4 p-3 rounded-md border {{ getSaveStatusClass() }}">
+      {{ saveStatus }}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-6 flex gap-3">
+      <button (click)="saveSettings()"
+              class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors">
+        Save Security Settings
+      </button>
+      <button (click)="resetToDefaults()"
+              class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+        Reset to Defaults
+      </button>
+    </div>
+  </div>
+
+  <!-- Security Information -->
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-lg font-medium text-blue-900 mb-3">🔒 Security Information</h3>
+    <div class="space-y-2 text-sm text-blue-800">
+      <p>• <strong>Tab Switching:</strong> Monitors visibility API to detect tab changes</p>
+      <p>• <strong>DevTools Detection:</strong> Uses multiple methods to detect developer tools</p>
+      <p>• <strong>Keyboard Blocking:</strong> Prevents access to browser shortcuts and tools</p>
+      <p>• <strong>Copy/Paste Prevention:</strong> Blocks clipboard operations during quiz</p>
+      <p>• <strong>Violation Tracking:</strong> Logs all security violations for review</p>
+    </div>
+    <div class="mt-4 p-3 bg-blue-100 rounded-md">
+      <p class="text-sm font-medium text-blue-900">
+        ⚠️ Note: These security measures work best in modern browsers. Some advanced users may find workarounds.
+      </p>
+    </div>
+  </div>
+</div>

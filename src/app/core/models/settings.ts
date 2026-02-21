@@ -1,3 +1,5 @@
+import { SecuritySettings } from '../services/anti-cheat.service';
+
 export interface PlatformSettings {
     siteName: string;
     welcomeMessage: string;
@@ -5,4 +7,5 @@ export interface PlatformSettings {
     maxAttempts?: number;
     allowRetakes?: boolean;
     showCorrectAnswers?: boolean;
+    securitySettings?: SecuritySettings;
 }

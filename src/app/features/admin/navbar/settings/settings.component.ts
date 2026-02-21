@@ -5,11 +5,12 @@ import { SettingsService } from '../../../../core/services/settings.service';
 import { PlatformSettings } from '../../../../core/models/settings';
 import { BrandingSettingsComponent } from './branding-settings/branding-settings.component';
 import { PlatformSettingsComponent } from './platform-settings/platform-settings.component';
+import { SecuritySettingsComponent } from './security-settings/security-settings.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, BrandingSettingsComponent, PlatformSettingsComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, BrandingSettingsComponent, PlatformSettingsComponent, SecuritySettingsComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })

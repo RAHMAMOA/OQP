@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { PlatformSettings } from '../models/settings';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { StorageService } from './storage.service';
+import { SecuritySettings } from './anti-cheat.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,16 @@ export class SettingsService {
     passingScore: 50,
     maxAttempts: 0,
     allowRetakes: true,
-    showCorrectAnswers: false
+    showCorrectAnswers: false,
+    securitySettings: {
+      preventTabSwitching: true,
+      preventCopyPaste: true,
+      preventRightClick: true,
+      preventKeyboardShortcuts: true,
+      detectDevTools: true,
+      maxViolations: 3,
+      autoSubmitOnViolation: true
+    }
   };
   private settingsSubject = new BehaviorSubject<PlatformSettings>(this.defaultSettings);
 
