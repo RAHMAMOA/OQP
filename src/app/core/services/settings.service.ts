@@ -17,13 +17,13 @@ export class SettingsService {
     allowRetakes: true,
     showCorrectAnswers: false,
     securitySettings: {
-      preventTabSwitching: true,
-      preventCopyPaste: true,
-      preventRightClick: true,
-      preventKeyboardShortcuts: true,
-      detectDevTools: true,
-      maxViolations: 3,
-      autoSubmitOnViolation: true
+      preventTabSwitching: false,
+      preventCopyPaste: false,
+      preventRightClick: false,
+      preventKeyboardShortcuts: false,
+      detectDevTools: false,
+      maxViolations: 5,
+      autoSubmitOnViolation: false
     }
   };
   private settingsSubject = new BehaviorSubject<PlatformSettings>(this.defaultSettings);

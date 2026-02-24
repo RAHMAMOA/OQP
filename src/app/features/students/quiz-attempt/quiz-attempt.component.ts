@@ -240,6 +240,10 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
   submitQuiz() {
     console.log('Submit quiz called');
 
+    // Debug: Check current attempt before submission
+    const currentAttempt = this.answerService.getCurrentAttempt();
+    console.log('Current attempt before submission:', currentAttempt);
+
     // Stop security monitoring
     this.antiCheatService.stopMonitoring();
 
@@ -248,7 +252,7 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
     }
 
     if (!this.currentAttempt) {
-      console.log('No active attempt found');
+      console.log('No active attempt found in component');
       return;
     }
 

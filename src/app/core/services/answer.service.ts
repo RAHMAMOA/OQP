@@ -52,7 +52,12 @@ export class AnswerService {
 
     submitQuizAttempt(): QuizAttempt | null {
         const currentAttempt = this.currentAttemptSubject.value;
-        if (!currentAttempt) return null;
+        console.log('AnswerService - Current attempt from BehaviorSubject:', currentAttempt);
+
+        if (!currentAttempt) {
+            console.log('AnswerService - No current attempt found, returning null');
+            return null;
+        }
 
         currentAttempt.endTime = new Date();
         currentAttempt.duration = Math.floor(
@@ -72,6 +77,7 @@ export class AnswerService {
         this.currentAttemptSubject.next(null);
         this.storageService.removeItem(this.currentAttemptKey);
 
+        console.log('AnswerService - Attempt submitted successfully:', currentAttempt);
         return currentAttempt;
     }
 

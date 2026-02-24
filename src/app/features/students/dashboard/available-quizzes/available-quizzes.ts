@@ -44,12 +44,19 @@ export class AvailableQuizzes {
     };
   }
 
-  getResultFlagColor(quizId: string): string {
-    const hasTaken = this.hasUserTakenQuiz(quizId);
+  getResultFlagColor(quizId: string): { class: string; text: string } {
     const showResults = this.settings?.showCorrectAnswers !== false; // Default to true if undefined
 
-    if (!hasTaken) return '';
-    return showResults ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600';
+    if (showResults) {
+      return {
+        class: 'bg-emerald-100 text-emerald-600',
+        text: 'Results Visible'
+      };
+    } else {
+      return {
+        class: 'bg-red-100 text-red-600',
+        text: 'Results Hidden'
+      };
+    }
   }
 }
-
