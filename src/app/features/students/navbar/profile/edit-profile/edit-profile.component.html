@@ -23,9 +23,13 @@
                 placeholder="Enter your full name">
             
             <!-- Validation Error -->
-            <div *ngIf="profileForm.get('fullName')?.invalid && profileForm.get('fullName')?.touched" class="mt-2 text-sm text-red-600">
-                <div *ngIf="profileForm.get('fullName')?.errors?.['required']">Full name is required</div>
+            @if (profileForm.get('fullName')?.invalid && profileForm.get('fullName')?.touched) {
+            <div class="mt-2 text-sm text-red-600">
+                @if (profileForm.get('fullName')?.errors?.['required']) {
+                <div>Full name is required</div>
+                }
             </div>
+            }
         </div>
 
         <!-- Email -->
@@ -43,10 +47,16 @@
                 placeholder="Enter your email">
             
             <!-- Validation Error -->
-            <div *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" class="mt-2 text-sm text-red-600">
-                <div *ngIf="profileForm.get('email')?.errors?.['required']">Email is required</div>
-                <div *ngIf="profileForm.get('email')?.errors?.['email']">Please enter a valid email</div>
+            @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+            <div class="mt-2 text-sm text-red-600">
+                @if (profileForm.get('email')?.errors?.['required']) {
+                <div>Email is required</div>
+                }
+                @if (profileForm.get('email')?.errors?.['email']) {
+                <div>Please enter a valid email</div>
+                }
             </div>
+            }
         </div>
 
         <!-- Action Buttons -->

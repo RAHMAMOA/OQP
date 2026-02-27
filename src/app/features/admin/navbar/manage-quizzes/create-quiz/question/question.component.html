@@ -25,7 +25,8 @@
     
     <!-- Multiple Choice -->
     <div *ngSwitchCase="'mcq'" class="space-y-3 pl-4 border-l-2 border-emerald-100">
-      <div *ngFor="let option of question.options; let optIndex = index; trackBy: trackByIndex" class="flex items-center space-x-3">
+    @for (option of question.options; track optIndex; let optIndex = $index) {
+    <div class="flex items-center space-x-3">
          <div class="relative flex items-center justify-center w-6 h-6">
             <input type="radio" 
                    [name]="'correct-' + questionIndex" 
@@ -40,15 +41,19 @@
                 (input)="onOptionChange(optIndex, $any($event.target).value)"
                 (blur)="onOptionBlur()"
                 class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 transition-all outline-none text-sm">
-         <button *ngIf="question.options && question.options.length > 2"
+         @if (question.options && question.options.length > 2) {
+         <button 
                 (click)="removeOption(optIndex)"
                 class="text-red-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
+        }
       </div>
-      <button *ngIf="question.options && question.options.length < 6"
+    }
+      @if (question.options && question.options.length < 6) {
+      <button 
               (click)="addOption()"
               class="text-emerald-600 hover:text-emerald-700 text-sm font-medium flex items-center space-x-1 mt-2 ml-9">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,6 +61,7 @@
         </svg>
         <span>Add Option</span>
       </button>
+      }
       <p class="text-xs text-gray-400 mt-2 ml-9">Select the radio button next to the correct answer</p>
     </div>
 

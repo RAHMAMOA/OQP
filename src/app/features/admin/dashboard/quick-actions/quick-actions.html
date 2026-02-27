@@ -1,7 +1,8 @@
 <section class="space-y-4">
   <h2 class="text-xl font-bold text-gray-900 border-l-4 border-emerald-500 pl-4">Quick Actions</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <a *ngFor="let action of actions" [routerLink]="action.path"
+    @for (action of actions; track action.path) {
+    <a [routerLink]="action.path"
        class="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:border-emerald-200 hover:shadow-md transition-all">
       <div class="flex items-center space-x-4">
         <svg [class]="action.color + ' w-6 h-6'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,5 +14,6 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
       </svg>
     </a>
+    }
   </div>
 </section>

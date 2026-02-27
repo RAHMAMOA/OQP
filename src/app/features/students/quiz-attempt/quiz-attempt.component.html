@@ -1,6 +1,7 @@
 <div class="min-h-screen bg-gray-50 font-['Inter',-apple-system,sans-serif]">
   <!-- Security Warning -->
-  <div *ngIf="showSecurityWarning" 
+  @if (showSecurityWarning) {
+  <div 
        class="fixed top-4 right-4 z-50 max-w-md bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg animate-pulse">
     <div class="flex items-start">
       <div class="flex-shrink-0">
@@ -14,6 +15,7 @@
       </div>
     </div>
   </div>
+  }
 
   <!-- Quiz Header Component -->
   <app-quiz-header 
@@ -24,7 +26,8 @@
   </app-quiz-header>
 
   <!-- Main Content -->
-  <main class="max-w-4xl mx-auto px-6 py-8" *ngIf="!isLoading && quiz && getCurrentQuestion()">
+  @if (!isLoading && quiz && getCurrentQuestion()) {
+  <main class="max-w-4xl mx-auto px-6 py-8">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
       <!-- Question Display Component -->
       <app-question-display
@@ -44,16 +47,20 @@
       </app-quiz-navigation>
     </div>
   </main>
+  }
 
   <!-- Loading State -->
-  <div class="max-w-4xl mx-auto px-6 py-8" *ngIf="isLoading">
+  @if (isLoading) {
+  <div class="max-w-4xl mx-auto px-6 py-8">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
       <p class="text-gray-500">Loading quiz...</p>
     </div>
   </div>
+  }
 
   <!-- No Questions State -->
-  <div class="max-w-4xl mx-auto px-6 py-8" *ngIf="!isLoading && quiz && !getCurrentQuestion()">
+  @if (!isLoading && quiz && !getCurrentQuestion()) {
+  <div class="max-w-4xl mx-auto px-6 py-8">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
       <p class="text-gray-500">This quiz has no questions yet.</p>
       <button routerLink="/dashboard" class="mt-4 px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors">
@@ -61,4 +68,5 @@
       </button>
     </div>
   </div>
+  }
 </div>

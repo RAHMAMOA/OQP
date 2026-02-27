@@ -5,16 +5,20 @@
   </button>
   
   <div class="flex space-x-4">
-    <button *ngIf="!isLastQuestion()" 
+    @if (!isLastQuestion()) {
+    <button 
             (click)="onNextQuestion()"
             class="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors">
       Next
     </button>
+    }
     
-    <button *ngIf="isLastQuestion()" 
+    @if (isLastQuestion()) {
+    <button 
             (click)="onSubmitQuiz()"
             class="px-6 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors">
       Submit Quiz
     </button>
+    }
   </div>
 </div>

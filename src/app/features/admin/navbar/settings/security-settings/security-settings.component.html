@@ -84,10 +84,12 @@
     </div>
 
     <!-- Save Status -->
-    <div *ngIf="saveStatus" 
+    @if (saveStatus) {
+    <div 
          class="mt-4 p-3 rounded-md border {{ getSaveStatusClass() }}">
       {{ saveStatus }}
     </div>
+    }
 
     <!-- Action Buttons -->
     <div class="mt-6 flex gap-3">

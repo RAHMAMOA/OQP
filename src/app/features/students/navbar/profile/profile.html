@@ -15,12 +15,13 @@
             </app-profile-info>
 
             <!-- Edit Profile Component -->
+            @if (isEditing) {
             <app-edit-profile 
-                *ngIf="isEditing"
                 [profileForm]="profileForm"
                 (save)="onSave()"
                 (cancel)="onCancel()">
             </app-edit-profile>
+            }
 
             <!-- Additional Info -->
             <section class="bg-blue-50 border border-blue-200 rounded-2xl p-6">

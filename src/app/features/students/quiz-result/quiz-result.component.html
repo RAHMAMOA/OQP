@@ -37,12 +37,13 @@
     </app-score-cards>
 
     <!-- Answer Review Component -->
+    @if (resultState.attempt && selectedAnswers && resultSettings.showCorrectAnswers) {
     <app-answer-review
-      *ngIf="resultState.attempt && selectedAnswers && resultSettings.showCorrectAnswers"
       [questions]="resultState.questions"
       [selectedAnswers]="selectedAnswers"
       [showCorrectAnswers]="resultSettings.showCorrectAnswers">
     </app-answer-review>
+    }
 
     <!-- Result Actions Component -->
     <app-result-actions
@@ -54,8 +55,8 @@
   </main>
 
   <!-- Retake Confirmation Dialog -->
+  @if (showRetakeConfirmation) {
   <app-confirmation-dialog
-    *ngIf="showRetakeConfirmation"
     title="Retake Quiz?"
     message="Are you sure you want to retake this quiz? Your previous attempt will be saved."
     confirmText="Retake Quiz"
@@ -63,4 +64,5 @@
     (confirmed)="confirmRetakeQuiz()"
     (cancelled)="cancelRetakeQuiz()">
   </app-confirmation-dialog>
+  }
 </div>

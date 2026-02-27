@@ -4,12 +4,11 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Top Performer</p>
         <p class="text-lg font-bold text-gray-800">
-            <ng-container *ngIf="topPerformer">
+            @if (topPerformer) {
                 {{ topPerformer.username }} ({{ topPerformer.avgScore }}%)
-            </ng-container>
-            <ng-container *ngIf="!topPerformer">
+            } @else {
                 <span class="text-gray-300">—</span>
-            </ng-container>
+            }
         </p>
     </div>
 
@@ -17,12 +16,11 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Most Active</p>
         <p class="text-lg font-bold text-gray-800">
-            <ng-container *ngIf="mostActive">
+            @if (mostActive) {
                 {{ mostActive.username }} ({{ mostActive.quizzesTaken }} quizzes)
-            </ng-container>
-            <ng-container *ngIf="!mostActive">
+            } @else {
                 <span class="text-gray-300">—</span>
-            </ng-container>
+            }
         </p>
     </div>
 

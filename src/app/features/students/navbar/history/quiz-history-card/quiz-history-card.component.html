@@ -6,12 +6,16 @@
             <!-- Status Icon -->
             <div class="flex h-12 w-12 items-center justify-center rounded-xl"
                  [ngClass]="attempt.status === 'Passed' ? 'bg-emerald-50' : 'bg-red-50'">
-                <svg *ngIf="attempt.status === 'Passed'" viewBox="0 0 24 24" class="h-6 w-6 text-emerald-500" fill="none" stroke="currentColor">
+                @if (attempt.status === 'Passed') {
+                <svg viewBox="0 0 24 24" class="h-6 w-6 text-emerald-500" fill="none" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <svg *ngIf="attempt.status === 'Failed'" viewBox="0 0 24 24" class="h-6 w-6 text-red-500" fill="none" stroke="currentColor">
+                }
+                @if (attempt.status === 'Failed') {
+                <svg viewBox="0 0 24 24" class="h-6 w-6 text-red-500" fill="none" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
+                }
             </div>
             
             <div>
@@ -57,7 +61,8 @@
 
         <!-- Action Buttons -->
         <div class="flex gap-3">
-            <button *ngIf="attempt.selectedAnswers && showCorrectAnswers" 
+            @if (attempt.selectedAnswers && showCorrectAnswers) {
+            <button 
                     (click)="onReviewAnswers()"
                     class="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg font-semibold hover:bg-emerald-600 transition-colors">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor">
@@ -65,8 +70,10 @@
                 </svg>
                 Review Answers
             </button>
+            }
             
-            <button *ngIf="canRetake" 
+            @if (canRetake) {
+            <button 
                     routerLink="/quiz/{{ attempt.quizId }}" 
                     class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-colors">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor">
@@ -74,6 +81,7 @@
                 </svg>
                 Retake Quiz
             </button>
+            }
         </div>
     </div>
 </div>

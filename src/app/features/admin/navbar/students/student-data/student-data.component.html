@@ -15,7 +15,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let student of students; let i = index"
+                @for (student of students; track student.username; let i = $index) {
+                <tr
                     class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                     <td class="px-6 py-4">
                         <span class="font-semibold text-gray-800">{{ student.username }}</span>
@@ -33,9 +34,10 @@
                     </td>
                     <td class="px-6 py-4 text-gray-700 font-medium text-sm">{{ student.passRate }}%</td>
                 </tr>
+                }
 
-                <!-- Empty State -->
-                <tr *ngIf="students.length === 0">
+                @if (students.length === 0) {
+                <tr>
                     <td colspan="5" class="px-6 py-12 text-center">
                         <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
@@ -45,6 +47,7 @@
                         <p class="text-gray-400 font-medium">No students registered yet</p>
                     </td>
                 </tr>
+                }
             </tbody>
         </table>
     </div>
