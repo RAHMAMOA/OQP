@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ResultActionsComponent {
   @Input() reviewMode!: boolean;
+  @Input() canRetakeQuiz!: boolean;
   @Output() goToDashboard = new EventEmitter<void>();
   @Output() retakeQuiz = new EventEmitter<void>();
 
@@ -18,6 +19,10 @@ export class ResultActionsComponent {
   }
 
   onRetakeQuiz() {
-    this.retakeQuiz.emit();
+    if (this.canRetakeQuiz) {
+      this.retakeQuiz.emit();
+    } else {
+      alert('Quiz retakes are not allowed. You have reached the maximum number of attempts or retakes are disabled by the administrator.');
+    }
   }
 }

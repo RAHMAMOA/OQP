@@ -5,7 +5,7 @@
     Back to Dashboard
   </button>
   
-  <button *ngIf="!reviewMode" (click)="onRetakeQuiz()" 
+  <button *ngIf="!reviewMode && canRetakeQuiz" (click)="onRetakeQuiz()" 
           class="px-6 py-3 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors">
     Retake Quiz
   </button>

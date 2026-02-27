@@ -3,7 +3,8 @@
   <h3 class="text-xl font-bold text-gray-900 mb-6">Review Answers</h3>
   
   <div class="space-y-6">
-    <div *ngFor="let question of questions; let i = index" class="border-b border-gray-100 pb-6 last:border-b-0">
+    @for (question of questions; track question; let i = $index) {
+    <div class="border-b border-gray-100 pb-6 last:border-b-0">
       <div class="flex items-start space-x-4">
         <div class="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">
           {{ i + 1 }}
@@ -12,56 +13,81 @@
           <h4 class="font-semibold text-gray-900 mb-2">{{ question.text }}</h4>
           
           <!-- Multiple Choice -->
-          <div *ngIf="question.type === 'mcq'" class="space-y-2">
-            <div *ngFor="let option of question.options; let j = index" class="flex items-center space-x-3">
+          @if (question.type === 'mcq') {
+          <div class="space-y-2">
+            @for (option of question.options; track option; let j = $index) {
+            <div class="flex items-center space-x-3">
               <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center"
                    [ngClass]="getAnswerClass(i, j)">
                 <div class="w-3 h-3 rounded-full"></div>
               </div>
               <span class="flex-1">{{ option }}</span>
-              <div *ngIf="getOptionIcon(i, j)" class="ml-2">
-                <svg *ngIf="getOptionIcon(i, j) === 'correct'" class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+              @if (getOptionIcon(i, j)) {
+              <div class="ml-2">
+                @if (getOptionIcon(i, j) === 'correct') {
+                <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010-1.414l-8 8a1 1 0 01-1.414 0l-8-8a1 1 0 011.414 1.414z" clip-rule="evenodd"/>
                 </svg>
-                <svg *ngIf="getOptionIcon(i, j) === 'incorrect'" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                }
+                @if (getOptionIcon(i, j) === 'incorrect') {
+                <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293 4.293a1 1 0 001.414 1.414L10 10.414l-4.293 4.293a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                 </svg>
+                }
               </div>
+              }
             </div>
+            }
           </div>
+          }
 
           <!-- True/False -->
-          <div *ngIf="question.type === 'true-false'" class="flex items-center space-x-4">
+          @if (question.type === 'true-false') {
+          <div class="flex items-center space-x-4">
             <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center"
                  [ngClass]="getTrueFalseClass(i, true)">
               <div class="w-3 h-3 rounded-full"></div>
             </div>
             <span class="font-medium text-gray-700">True</span>
-            <div *ngIf="getTrueFalseIcon(i, true)" class="ml-2">
-              <svg *ngIf="getTrueFalseIcon(i, true) === 'correct'" class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+            @if (getTrueFalseIcon(i, true)) {
+            <div class="ml-2">
+              @if (getTrueFalseIcon(i, true) === 'correct') {
+              <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010-1.414l-8 8a1 1 0 01-1.414 0l-8-8a1 1 0 011.414 1.414z" clip-rule="evenodd"/>
               </svg>
-              <svg *ngIf="getTrueFalseIcon(i, true) === 'incorrect'" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              }
+              @if (getTrueFalseIcon(i, true) === 'incorrect') {
+              <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293 4.293a1 1 0 001.414 1.414L10 10.414l-4.293 4.293a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
               </svg>
+              }
             </div>
+            }
             <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center"
                  [ngClass]="getTrueFalseClass(i, false)">
               <div class="w-3 h-3 rounded-full"></div>
             </div>
             <span class="font-medium text-gray-700">False</span>
-            <div *ngIf="getTrueFalseIcon(i, false)" class="ml-2">
-              <svg *ngIf="getTrueFalseIcon(i, false) === 'correct'" class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+            @if (getTrueFalseIcon(i, false)) {
+            <div class="ml-2">
+              @if (getTrueFalseIcon(i, false) === 'correct') {
+              <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010-1.414l-8 8a1 1 0 01-1.414 0l-8-8a1 1 0 011.414 1.414z" clip-rule="evenodd"/>
               </svg>
-              <svg *ngIf="getTrueFalseIcon(i, false) === 'incorrect'" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              }
+              @if (getTrueFalseIcon(i, false) === 'incorrect') {
+              <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293 4.293a1 1 0 001.414 1.414L10 10.414l-4.293 4.293a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
               </svg>
+              }
             </div>
+            }
           </div>
+          }
 
           <!-- Essay Question -->
-          <div *ngIf="question.type === 'essay'" class="space-y-3">
+          @if (question.type === 'essay') {
+          <div class="space-y-3">
             <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <p class="text-gray-700 whitespace-pre-wrap font-medium">Your answer:</p>
               <p class="text-gray-900 whitespace-pre-wrap mt-2">{{ selectedAnswers[i] || 'No answer provided' }}</p>
@@ -69,14 +95,20 @@
             <div class="flex items-center space-x-2 text-sm p-3 rounded-lg border"
                  [class]="isAnswerCorrect(question, selectedAnswers[i]) ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-red-600 bg-red-50 border-red-100'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path *ngIf="isAnswerCorrect(question, selectedAnswers[i])" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                <path *ngIf="!isAnswerCorrect(question, selectedAnswers[i])" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                @if (isAnswerCorrect(question, selectedAnswers[i])) {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                }
+                @if (!isAnswerCorrect(question, selectedAnswers[i])) {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                }
               </svg>
               <span class="font-medium">{{ isAnswerCorrect(question, selectedAnswers[i]) ? 'Correct' : 'Incorrect' }}</span>
             </div>
           </div>
+          }
         </div>
       </div>
     </div>
+    }
   </div>
 </div>

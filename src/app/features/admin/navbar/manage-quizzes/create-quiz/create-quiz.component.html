@@ -9,7 +9,8 @@
   </div>
 
   <!-- Validation Errors -->
-  <div *ngIf="validationErrors.length > 0" class="bg-red-50 border border-red-200 rounded-xl p-4">
+  @if (validationErrors.length > 0) {
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4">
     <div class="flex items-start space-x-3">
       <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
@@ -17,12 +18,14 @@
       <div>
         <h3 class="font-medium text-red-900 mb-1">Please fix the following errors:</h3>
         <ul class="text-sm text-red-700 space-y-1">
-          <li *ngFor="let error of validationErrors">{{ error }}</li>
+          @for (error of validationErrors; track error) {
+          <li>{{ error }}</li>
+          }
         </ul>
       </div>
     </div>
   </div>
-
+  }
   <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6">
     <form [formGroup]="quizForm">
       <!-- Quiz Title -->
@@ -38,10 +41,16 @@
           [class.focus:border-red-500]="titleControl?.invalid && titleControl?.touched">
         
         <!-- Validation Error -->
-        <div *ngIf="titleControl?.invalid && titleControl?.touched" class="mt-2 text-sm text-red-600">
-          <div *ngIf="titleControl?.errors?.['required']">Quiz title is required</div>
-          <div *ngIf="titleControl?.errors?.['minlength']">Quiz title must be at least 3 characters long</div>
+        @if (titleControl?.invalid && titleControl?.touched) {
+        <div class="mt-2 text-sm text-red-600">
+          @if (titleControl?.errors?.['required']) {
+          <div>Quiz title is required</div>
+          }
+          @if (titleControl?.errors?.['minlength']) {
+          <div>Quiz title must be at least 3 characters long</div>
+          }
         </div>
+        }
       </div>
 
       <!-- Description -->
@@ -57,10 +66,16 @@
           [class.focus:border-red-500]="descriptionControl?.invalid && descriptionControl?.touched"></textarea>
         
         <!-- Validation Error -->
-        <div *ngIf="descriptionControl?.invalid && descriptionControl?.touched" class="mt-2 text-sm text-red-600">
-          <div *ngIf="descriptionControl?.errors?.['required']">Quiz description is required</div>
-          <div *ngIf="descriptionControl?.errors?.['minlength']">Quiz description must be at least 10 characters long</div>
+        @if (descriptionControl?.invalid && descriptionControl?.touched) {
+        <div class="mt-2 text-sm text-red-600">
+          @if (descriptionControl?.errors?.['required']) {
+          <div>Quiz description is required</div>
+          }
+          @if (descriptionControl?.errors?.['minlength']) {
+          <div>Quiz description must be at least 10 characters long</div>
+          }
         </div>
+        }
       </div>
 
       <!-- Time Limit -->
@@ -76,11 +91,19 @@
           [class.focus:border-red-500]="timeLimitControl?.invalid && timeLimitControl?.touched">
         
         <!-- Validation Error -->
-        <div *ngIf="timeLimitControl?.invalid && timeLimitControl?.touched" class="mt-2 text-sm text-red-600">
-          <div *ngIf="timeLimitControl?.errors?.['required']">Time limit is required</div>
-          <div *ngIf="timeLimitControl?.errors?.['min']">Time limit must be at least 1 minute</div>
-          <div *ngIf="timeLimitControl?.errors?.['max']">Time limit cannot exceed 180 minutes</div>
+        @if (timeLimitControl?.invalid && timeLimitControl?.touched) {
+        <div class="mt-2 text-sm text-red-600">
+          @if (timeLimitControl?.errors?.['required']) {
+          <div>Time limit is required</div>
+          }
+          @if (timeLimitControl?.errors?.['min']) {
+          <div>Time limit must be at least 1 minute</div>
+          }
+          @if (timeLimitControl?.errors?.['max']) {
+          <div>Time limit cannot exceed 180 minutes</div>
+          }
         </div>
+        }
       </div>
     </form>
   </div>
@@ -100,8 +123,8 @@
         </button>
 
         <!-- Dropdown Menu -->
-        <div *ngIf="isDropdownOpen" 
-             class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-10 animate-fade-in-down">
+        @if (isDropdownOpen) {
+        <div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-10 animate-fade-in-down">
           <button (click)="debugLog('MCQ clicked'); addQuestion('mcq'); isDropdownOpen = false" class="w-full px-4 py-3 text-left hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center space-x-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>Multiple Choice</span>
@@ -116,18 +139,20 @@
             <span>Essay</span>
           </button>
         </div>
+        }
       </div>
     </div>
 
     <!-- Questions List -->
     <div class="space-y-6">
-      <div *ngFor="let warning of 'No questions yet. Click Add Question to begin.' | i18nSelect: { other: '' }; let i = index">
-        <div *ngIf="questions.length === 0" class="text-center py-10 text-gray-400 font-medium bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-          {{ warning }}
-        </div>
+      @if (questions.length === 0) {
+      <div class="text-center py-10 text-gray-400 font-medium bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+        No questions yet. Click Add Question to begin.
       </div>
+      }
 
-      <div *ngFor="let question of questions; let i = index" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      @for (question of questions; track question; let i = $index) {
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div class="flex justify-between items-start mb-4">
           <div class="flex items-center space-x-3">
             <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-sm font-bold text-emerald-600">
@@ -150,6 +175,7 @@
                       (remove)="removeQuestion(i)">
         </app-question>
       </div>
+      }
     </div>
 
     <div class="flex items-center space-x-4 pt-4">
@@ -157,15 +183,23 @@
         (click)="saveQuiz()" 
         [disabled]="quizForm.invalid || isSaving || questions.length === 0"
         class="bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md shadow-emerald-200 flex items-center space-x-2">
-        <svg *ngIf="!isSaving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        @if (!isSaving) {
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
         </svg>
-        <svg *ngIf="isSaving" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+        }
+        @if (isSaving) {
+        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span *ngIf="!isSaving">Save Quiz</span>
-        <span *ngIf="isSaving">Saving...</span>
+        }
+        @if (!isSaving) {
+        <span>Save Quiz</span>
+        }
+        @if (isSaving) {
+        <span>Saving...</span>
+        }
       </button>
       <button routerLink="/admin/quizzes" class="text-gray-500 hover:text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition-all">Cancel</button>
     </div>

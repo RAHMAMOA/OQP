@@ -1,5 +1,5 @@
-<div class="min-h-screen font-sans text-slate-800">
-    <div class="mx-auto max-w-7xl pb-10">
+<div class="min-h-screen bg-gray-50 font-['Inter',-apple-system,sans-serif] text-slate-800">
+    <div class="mx-auto max-w-[1200px] pb-10">
         <!-- Main Content -->
         <main class="px-6 mt-8">
             <header class="mb-8">
@@ -8,7 +8,8 @@
             </header>
 
             <!-- Empty State -->
-            <div *ngIf="attempts.length === 0" class="flex flex-col items-center justify-center py-24 text-slate-400">
+            @if (attempts.length === 0) {
+            <div class="flex flex-col items-center justify-center py-24 text-slate-400">
                 <svg viewBox="0 0 24 24" class="h-20 w-20 mb-6 fill-none stroke-current stroke-1 opacity-50">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
@@ -16,11 +17,13 @@
                 <p class="text-2xl font-medium">No quiz attempts yet</p>
                 <p class="text-lg mt-2">Take a quiz to see your history here.</p>
             </div>
+            }
 
             <!-- Attempt List -->
-            <div *ngIf="attempts.length > 0" class="space-y-4">
-                <div *ngFor="let attempt of attempts; let i = index"
-                    class="bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200">
+            @if (attempts.length > 0) {
+            <div class="space-y-4">
+                @for (attempt of attempts; track attempt; let i = $index) {
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200">
 
                     <!-- Header Row -->
                     <div class="flex items-center justify-between p-6 border-b border-slate-100">
@@ -28,12 +31,16 @@
                             <!-- Status Icon -->
                             <div class="flex h-12 w-12 items-center justify-center rounded-xl"
                                  [ngClass]="attempt.status === 'Passed' ? 'bg-emerald-50' : 'bg-red-50'">
-                                <svg *ngIf="attempt.status === 'Passed'" viewBox="0 0 24 24" class="h-6 w-6 text-emerald-500" fill="none" stroke="currentColor">
+                                @if (attempt.status === 'Passed') {
+                                <svg viewBox="0 0 24 24" class="h-6 w-6 text-emerald-500" fill="none" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
-                                <svg *ngIf="attempt.status === 'Failed'" viewBox="0 0 24 24" class="h-6 w-6 text-red-500" fill="none" stroke="currentColor">
+                                }
+                                @if (attempt.status === 'Failed') {
+                                <svg viewBox="0 0 24 24" class="h-6 w-6 text-red-500" fill="none" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
+                                }
                             </div>
                             
                             <div>
@@ -81,7 +88,8 @@
 
                         <!-- Action Buttons -->
                         <div class="flex gap-3">
-                            <button *ngIf="attempt.selectedAnswers && showCorrectAnswers" 
+                            @if (attempt.selectedAnswers && showCorrectAnswers) {
+                            <button 
                                     (click)="reviewAnswers(attempt)"
                                     class="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg font-semibold hover:bg-emerald-600 transition-colors">
                                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor">
@@ -89,8 +97,9 @@
                                 </svg>
                                 Review Answers
                             </button>
-                            
-                            <button *ngIf="canRetakeQuiz(attempt)" 
+                            }
+                            @if (canRetakeQuiz(attempt)) {
+                            <button 
                                     routerLink="/quiz/{{ attempt.quizId }}" 
                                     class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-colors">
                                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor">
@@ -98,10 +107,13 @@
                                 </svg>
                                 Retake Quiz
                             </button>
+                            }
                         </div>
                     </div>
                 </div>
+                }
             </div>
+            }
         </main>
     </div>
 </div>

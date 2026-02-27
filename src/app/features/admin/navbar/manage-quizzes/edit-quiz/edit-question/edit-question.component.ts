@@ -18,6 +18,23 @@ export class EditQuestionComponent {
 
   String = String; // Add String constructor for template access
 
+  // Helper methods for type checking
+  isMcq(): boolean {
+    return this.question.type === 'mcq';
+  }
+
+  isTrueFalse(): boolean {
+    return this.question.type === 'true-false';
+  }
+
+  isEssay(): boolean {
+    return this.question.type === 'essay';
+  }
+
+  isFillBlank(): boolean {
+    return this.question.type === 'fill-blank';
+  }
+
   onQuestionChange() {
     this.questionChange.emit(this.question);
   }

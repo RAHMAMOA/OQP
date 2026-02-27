@@ -31,13 +31,13 @@ export class AntiCheatService implements OnDestroy {
   private isAutoSubmitting = false;
 
   readonly defaultSettings: SecuritySettings = {
-    preventTabSwitching: true,
-    preventCopyPaste: true,
-    preventRightClick: true,
-    preventKeyboardShortcuts: true,
-    detectDevTools: true,
-    maxViolations: 3,
-    autoSubmitOnViolation: true
+    preventTabSwitching: false,
+    preventCopyPaste: false,
+    preventRightClick: false,
+    preventKeyboardShortcuts: false,
+    detectDevTools: false,
+    maxViolations: 5,
+    autoSubmitOnViolation: false
   };
 
   private currentSettings: SecuritySettings = { ...this.defaultSettings };
@@ -59,57 +59,122 @@ export class AntiCheatService implements OnDestroy {
   }
 
   startMonitoring() {
-    if (this.isActive) return;
+    console.log('AntiCheatService: startMonitoring called, isActive:', this.isActive);
+    console.log('AntiCheatService: Current settings:', this.currentSettings);
+
+    if (this.isActive) {
+      console.log('AntiCheatService: Already active, returning');
+      return;
+    }
+
+    // Check if any security features are enabled
+    const anyFeatureEnabled = this.currentSettings.preventTabSwitching ||
+      this.currentSettings.preventCopyPaste ||
+      this.currentSettings.preventRightClick ||
+      this.currentSettings.preventKeyboardShortcuts ||
+      this.currentSettings.detectDevTools;
+
+    console.log('AntiCheatService: Any feature enabled:', anyFeatureEnabled);
+
+    // If no features are enabled, don't start monitoring
+    if (!anyFeatureEnabled) {
+      console.log('AntiCheatService: No security features enabled, skipping monitoring setup');
+      return;
+    }
 
     this.isActive = true;
     this.violationCount = 0;
     this.isAutoSubmitting = false;
     this.securityEvents$.next([]);
 
+    console.log('AntiCheatService: Starting monitoring with settings:', this.currentSettings);
+
     // Tab switching detection
     if (this.currentSettings.preventTabSwitching) {
+      console.log('AntiCheatService: Setting up tab switching detection');
       this.setupTabSwitchingDetection();
     }
 
-    // Window focus/blur monitoring
+    // Window focus/blur monitoring (only if other features are enabled)
+    console.log('AntiCheatService: Setting up window focus monitoring');
     this.setupWindowFocusMonitoring();
 
     // DevTools detection
     if (this.currentSettings.detectDevTools) {
+      console.log('AntiCheatService: Setting up DevTools detection');
       this.setupDevToolsDetection();
     }
 
     // Copy-paste prevention
     if (this.currentSettings.preventCopyPaste) {
+      console.log('AntiCheatService: Setting up copy-paste prevention');
       this.setupCopyPastePrevention();
     }
 
     // Right-click prevention
     if (this.currentSettings.preventRightClick) {
+      console.log('AntiCheatService: Setting up right-click prevention');
       this.setupRightClickPrevention();
     }
 
     // Keyboard shortcuts prevention
     if (this.currentSettings.preventKeyboardShortcuts) {
+      console.log('AntiCheatService: Setting up keyboard shortcuts prevention');
       this.setupKeyboardShortcutsPrevention();
     }
   }
 
   stopMonitoring() {
-    if (!this.isActive) return;
+    console.log('AntiCheatService: stopMonitoring called, isActive:', this.isActive);
 
-    this.isActive = false;
-
-    // Clear all event listeners
-    this.destroy$.next();
-
-    // Clear devtools check interval
-    if (this.devtoolsCheckInterval) {
-      clearInterval(this.devtoolsCheckInterval);
+    if (!this.isActive) {
+      console.log('AntiCheatService: Not active, nothing to stop');
+      return;
     }
 
-    // Restore console
-    this.restoreConsole();
+    console.log('AntiCheatService: Stopping all monitoring');
+    this.isActive = false;
+
+    // Clear all event listeners and intervals
+    if (this.devtoolsCheckInterval) {
+      clearInterval(this.devtoolsCheckInterval);
+      this.devtoolsCheckInterval = null;
+    }
+
+    // Emit destroy signal to clean up all subscriptions
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // Create new destroy subject for future use
+    this.destroy$ = new Subject<void>();
+
+    // Reset violation tracking
+    this.violationCount = 0;
+    this.isAutoSubmitting = false;
+    this.securityEvents$.next([]);
+
+    console.log('AntiCheatService: All monitoring stopped');
+  }
+
+  forceStopMonitoring() {
+    console.log('AntiCheatService: forceStopMonitoring called - stopping all monitoring regardless of state');
+    this.isActive = false;
+
+    if (this.devtoolsCheckInterval) {
+      clearInterval(this.devtoolsCheckInterval);
+      this.devtoolsCheckInterval = null;
+    }
+
+    // Force cleanup
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.destroy$ = new Subject<void>();
+
+    this.violationCount = 0;
+    this.isAutoSubmitting = false;
+    this.securityEvents$.next([]);
+
+    console.log('AntiCheatService: Force stopped all monitoring');
   }
 
   private setupTabSwitchingDetection() {

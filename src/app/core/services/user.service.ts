@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/user';
+import { StorageService } from './storage.service';
 
 @Injectable({
     providedIn: 'root'
@@ -7,12 +8,15 @@ import { User } from '../models/user';
 export class UserService {
     private readonly STORAGE_KEY = 'oqp_users';
 
+    constructor(private storageService: StorageService) { }
+
     getUsers(): User[] {
-        const usersJson = localStorage.getItem(this.STORAGE_KEY);
-        let users: User[] = usersJson ? JSON.parse(usersJson) : [];
+        const users = this.storageService.getItem<User[]>(this.STORAGE_KEY) || [];
+        console.log('UserService: Retrieved users from storage:', users);
 
         // Seed default admin if it doesn't exist
         if (!users.some(u => u.username === 'admin')) {
+            console.log('UserService: Adding default admin user');
             users.push({
                 id: 'admin-1',
                 username: 'admin',
@@ -21,16 +25,22 @@ export class UserService {
                 password: 'admin123',
                 role: 'admin'
             });
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(users));
+            this.storageService.setItem(this.STORAGE_KEY, users);
         }
 
         // Fix existing users without passwords
+        let needsUpdate = false;
         users.forEach(user => {
             if (!user.password && user.email === 'r44234782@gmail.com') {
                 user.password = 'rah123';
-                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(users));
+                needsUpdate = true;
             }
         });
+
+        if (needsUpdate) {
+            console.log('UserService: Updated user password');
+            this.storageService.setItem(this.STORAGE_KEY, users);
+        }
 
         return users;
     }
@@ -38,7 +48,7 @@ export class UserService {
     addUser(user: User): void {
         const users = this.getUsers();
         users.push(user);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(users));
+        this.storageService.setItem(this.STORAGE_KEY, users);
     }
 
     emailExists(email: string): boolean {
@@ -52,7 +62,7 @@ export class UserService {
 
         if (userIndex !== -1) {
             users[userIndex] = updatedUser;
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(users));
+            this.storageService.setItem(this.STORAGE_KEY, users);
         }
     }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UserService } from './user.service';
 import { User } from '../models/user';
+import { StorageService } from './storage.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 
 @Injectable({
@@ -10,10 +11,10 @@ export class AuthService {
     private readonly SESSION_KEY = 'oqp_session';
     private currentUserSubject = new BehaviorSubject<User | null>(null);
 
-    constructor(private userService: UserService) {
-        const session = localStorage.getItem(this.SESSION_KEY);
+    constructor(private userService: UserService, private storageService: StorageService) {
+        const session = this.storageService.getItem<User>(this.SESSION_KEY);
         if (session) {
-            this.currentUserSubject.next(JSON.parse(session));
+            this.currentUserSubject.next(session);
         }
     }
 
@@ -27,7 +28,7 @@ export class AuthService {
 
         if (user) {
             const { password, ...userWithoutPassword } = user;
-            localStorage.setItem(this.SESSION_KEY, JSON.stringify(userWithoutPassword));
+            this.storageService.setItem(this.SESSION_KEY, userWithoutPassword);
             this.currentUserSubject.next(userWithoutPassword as User);
             return of(true);
         }
@@ -36,7 +37,7 @@ export class AuthService {
     }
 
     logout(): void {
-        localStorage.removeItem(this.SESSION_KEY);
+        this.storageService.removeItem(this.SESSION_KEY);
         this.currentUserSubject.next(null);
     }
 
@@ -50,7 +51,7 @@ export class AuthService {
 
     updateProfile(updatedUser: User): void {
         const { password, ...userWithoutPassword } = updatedUser;
-        localStorage.setItem(this.SESSION_KEY, JSON.stringify(userWithoutPassword));
+        this.storageService.setItem(this.SESSION_KEY, userWithoutPassword);
         this.currentUserSubject.next(userWithoutPassword as User);
         this.userService.updateUser(updatedUser);
     }

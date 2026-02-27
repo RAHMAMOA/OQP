@@ -47,6 +47,7 @@
     <!-- Result Actions Component -->
     <app-result-actions
       [reviewMode]="resultState.reviewMode"
+      [canRetakeQuiz]="canRetakeQuiz()"
       (goToDashboard)="goToDashboard()"
       (retakeQuiz)="retakeQuiz()">
     </app-result-actions>

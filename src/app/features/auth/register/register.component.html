@@ -11,12 +11,14 @@
     </div>
     
     <!-- Error Message Alert -->
-    <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-100 text-sm flex items-center gap-3 animate-pulse">
+    @if (errorMessage) {
+    <div class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-100 text-sm flex items-center gap-3 animate-pulse">
       <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
       </svg>
       {{ errorMessage }}
     </div>
+    }
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <div>
@@ -28,9 +30,11 @@
           placeholder="Choose a username"
           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent outline-none text-white placeholder-white/50 transition-all"
         >
-        <div *ngIf="registerForm.get('username')?.touched && registerForm.get('username')?.invalid" class="text-yellow-200 text-xs mt-1">
+        @if (registerForm.get('username')?.touched && registerForm.get('username')?.invalid) {
+        <div class="text-yellow-200 text-xs mt-1">
           Username required (min 3 chars)
         </div>
+        }
       </div>
 
       <div>
@@ -42,9 +46,11 @@
           placeholder="Enter your full name"
           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent outline-none text-white placeholder-white/50 transition-all"
         >
-        <div *ngIf="registerForm.get('fullName')?.touched && registerForm.get('fullName')?.invalid" class="text-yellow-200 text-xs mt-1">
+        @if (registerForm.get('fullName')?.touched && registerForm.get('fullName')?.invalid) {
+        <div class="text-yellow-200 text-xs mt-1">
           Full name required (min 2 chars)
         </div>
+        }
       </div>
 
       <div>
@@ -56,9 +62,11 @@
           placeholder="email@example.com"
           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent outline-none text-white placeholder-white/50 transition-all"
         >
-        <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid" class="text-yellow-200 text-xs mt-1">
+        @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
+        <div class="text-yellow-200 text-xs mt-1">
           Enter a valid email
         </div>
+        }
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -83,12 +91,16 @@
           >
         </div>
       </div>
-      <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid" class="text-yellow-200 text-xs">
+      @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
+      <div class="text-yellow-200 text-xs">
         Password required (min 6 chars)
       </div>
-      <div *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched" class="text-yellow-200 text-xs">
+      }
+      @if (registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched) {
+      <div class="text-yellow-200 text-xs">
         Passwords do not match
       </div>
+      }
 
       <button 
         type="submit" 

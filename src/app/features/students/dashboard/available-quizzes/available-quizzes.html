@@ -1,9 +1,9 @@
 <section>
     <h2 class="mb-6 text-2xl font-bold text-slate-800">Available Quizzes</h2>
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(400px,1fr))]">
-        <ng-container *ngIf="quizzes">
-            <div class="flex flex-col gap-4 rounded-[20px] bg-white p-8 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]"
-                *ngFor="let quiz of quizzes">
+        @if (quizzes) {
+            @for (quiz of quizzes; track quiz) {
+            <div class="flex flex-col gap-4 rounded-[20px] bg-white p-8 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]">
                 <div class="flex items-start justify-between">
                     <h3 class="text-xl font-bold text-slate-900">{{quiz.title}}</h3>
                     <div class="flex items-center gap-2">
@@ -14,9 +14,11 @@
                             </svg>
                             {{getResultFlagColor(quiz.id).text}}
                         </span>
-                        <span *ngIf="!hasUserTakenQuiz(quiz.id)" class="rounded-md px-2.5 py-1 text-[13px] font-bold bg-blue-50 text-blue-600">
+                        @if (!hasUserTakenQuiz(quiz.id)) {
+                        <span class="rounded-md px-2.5 py-1 text-[13px] font-bold bg-blue-50 text-blue-600">
                             New
                         </span>
+                        }
                     </div>
                 </div>
                 <p class="m-0 text-[15px] leading-relaxed text-slate-500">{{quiz.description}}</p>
@@ -37,8 +39,10 @@
                             {{quiz.time}}m
                         </span>
                     </div>
-                    <ng-container *ngIf="getQuizButtonState(quiz.id) as buttonState">
-                        <button *ngIf="buttonState.canTake"
+                    @if (getQuizButtonState(quiz.id); as buttonState) {
+                    <ng-container>
+                        @if (buttonState.canTake) {
+                        <button 
                                 routerLink="/quiz/{{quiz.id}}"
                                 class="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-500 transition-colors hover:bg-slate-100 cursor-pointer">
                             <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 fill-none stroke-current">
@@ -47,7 +51,9 @@
                             </svg>
                             Start Quiz
                         </button>
-                        <button *ngIf="buttonState.showCompleted"
+                        }
+                        @if (buttonState.showCompleted) {
+                        <button 
                                 disabled
                                 class="flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-500 cursor-not-allowed">
                             <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 fill-none stroke-current">
@@ -56,9 +62,12 @@
                             </svg>
                             Completed
                         </button>
+                        }
                     </ng-container>
+                    }
                 </div>
             </div>
-        </ng-container>
+            }
+        }
     </div>
 </section>

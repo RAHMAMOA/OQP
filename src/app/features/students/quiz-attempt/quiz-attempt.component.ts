@@ -36,6 +36,7 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   maxAttempts = 0;
   allowRetakes = false;
+  isSubmitting = false; // Flag to prevent duplicate submissions
 
   // Security properties
   securityEvents: SecurityEvent[] = [];
@@ -65,7 +66,16 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
 
         // Setup security monitoring with settings
         if (settings.securitySettings) {
+          console.log('Quiz component: Updating security settings:', settings.securitySettings);
+
+          // Force stop any existing monitoring first
+          this.antiCheatService.forceStopMonitoring();
+
+          // Update settings
           this.antiCheatService.updateSettings(settings.securitySettings);
+
+          // Start monitoring with new settings
+          this.antiCheatService.startMonitoring();
         }
       });
 
@@ -74,16 +84,30 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(events => {
         this.securityEvents = events;
+        console.log('Quiz component - Security events updated:', events.length, events);
 
         // Check for auto-submit condition
         const latestEvent = events[events.length - 1];
+
         if (latestEvent?.details?.autoSubmit) {
-          this.handleSecurityViolation('Maximum security violations reached. Quiz will be submitted automatically.');
-          this.submitQuiz();
+          const settings = this.antiCheatService.getCurrentSettings();
+          console.log('Auto-submit event detected, checking settings:', settings);
+
+          // Only auto-submit if it's enabled in settings
+          if (settings.autoSubmitOnViolation) {
+            console.log('Auto-submit is enabled, submitting quiz');
+            this.handleSecurityViolation('Maximum security violations reached. Quiz will be submitted automatically.');
+            this.submitQuiz();
+          } else {
+            console.log('Auto-submit is disabled in settings, ignoring auto-submit event');
+          }
         } else if (events.length > 0) {
           const violationCount = this.antiCheatService.getViolationCount();
           const settings = this.antiCheatService.getCurrentSettings();
           const remaining = settings.maxViolations - violationCount;
+
+          console.log(`Security violation: ${violationCount}/${settings.maxViolations}, remaining: ${remaining}`);
+          console.log('Latest event:', latestEvent);
 
           if (remaining > 0) {
             this.handleSecurityViolation(`Security violation detected! ${remaining} more violations will result in automatic submission.`);
@@ -143,9 +167,6 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
         // Start quiz attempt
         const maxScore = this.questions.reduce((sum, q) => sum + q.points, 0);
         this.currentAttempt = this.answerService.startQuizAttempt(quizId, maxScore);
-
-        // Start security monitoring
-        this.antiCheatService.startMonitoring();
 
         this.startTimer();
       }
@@ -240,9 +261,23 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
   submitQuiz() {
     console.log('Submit quiz called');
 
+    // Prevent duplicate submissions
+    if (this.isSubmitting) {
+      console.log('Quiz already being submitted, ignoring duplicate call');
+      return;
+    }
+
     // Debug: Check current attempt before submission
     const currentAttempt = this.answerService.getCurrentAttempt();
     console.log('Current attempt before submission:', currentAttempt);
+
+    if (!this.currentAttempt) {
+      console.log('No active attempt found in component');
+      return;
+    }
+
+    // Set submission flag
+    this.isSubmitting = true;
 
     // Stop security monitoring
     this.antiCheatService.stopMonitoring();
@@ -251,25 +286,27 @@ export class QuizAttemptComponent implements OnInit, OnDestroy {
       clearInterval(this.timer);
     }
 
-    if (!this.currentAttempt) {
-      console.log('No active attempt found in component');
-      return;
-    }
-
     // Submit the attempt
     const submittedAttempt = this.answerService.submitQuizAttempt();
 
     if (submittedAttempt) {
       console.log('Attempt submitted:', submittedAttempt);
 
-      this.router.navigate(['/quiz-result', submittedAttempt.quizId], {
-        queryParams: {
-          score: submittedAttempt.percentage,
-          correct: submittedAttempt.totalScore,
-          wrong: submittedAttempt.maxScore - submittedAttempt.totalScore,
-          attemptId: submittedAttempt.id
-        }
-      });
+      // Check if results should be shown
+      const settings = this.settingsService.getSettings();
+      if (settings.showCorrectAnswers) {
+        this.router.navigate(['/quiz-result', submittedAttempt.quizId], {
+          queryParams: {
+            score: submittedAttempt.percentage,
+            correct: submittedAttempt.totalScore,
+            wrong: submittedAttempt.maxScore - submittedAttempt.totalScore,
+            attemptId: submittedAttempt.id
+          }
+        });
+      } else {
+        // Results are hidden, redirect to dashboard
+        this.router.navigate(['/dashboard']);
+      }
     } else {
       console.log('Failed to submit attempt');
       this.router.navigate(['/dashboard']);

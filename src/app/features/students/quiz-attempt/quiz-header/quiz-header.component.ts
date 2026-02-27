@@ -1,12 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { Quiz } from '../../../../core/models/quiz';
 
 @Component({
   selector: 'app-quiz-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './quiz-header.component.html',
   styleUrl: './quiz-header.component.css'
 })

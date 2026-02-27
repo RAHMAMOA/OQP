@@ -22,10 +22,16 @@
                 placeholder="Enter your platform name">
             
             <!-- Validation Error -->
-            <div *ngIf="siteNameControl?.invalid && siteNameControl?.touched" class="mt-2 text-sm text-red-600">
-                <div *ngIf="siteNameControl?.errors?.['required']">Site name is required</div>
-                <div *ngIf="siteNameControl?.errors?.['minlength']">Site name must be at least 2 characters</div>
+            @if (siteNameControl?.invalid && siteNameControl?.touched) {
+            <div class="mt-2 text-sm text-red-600">
+                @if (siteNameControl?.errors?.['required']) {
+                <div>Site name is required</div>
+                }
+                @if (siteNameControl?.errors?.['minlength']) {
+                <div>Site name must be at least 2 characters</div>
+                }
             </div>
+            }
         </div>
 
         <!-- Welcome Message -->
@@ -43,10 +49,16 @@
                 placeholder="Enter welcome message for students"></textarea>
             
             <!-- Validation Error -->
-            <div *ngIf="welcomeMessageControl?.invalid && welcomeMessageControl?.touched" class="mt-2 text-sm text-red-600">
-                <div *ngIf="welcomeMessageControl?.errors?.['required']">Welcome message is required</div>
-                <div *ngIf="welcomeMessageControl?.errors?.['minlength']">Welcome message must be at least 10 characters</div>
+            @if (welcomeMessageControl?.invalid && welcomeMessageControl?.touched) {
+            <div class="mt-2 text-sm text-red-600">
+                @if (welcomeMessageControl?.errors?.['required']) {
+                <div>Welcome message is required</div>
+                }
+                @if (welcomeMessageControl?.errors?.['minlength']) {
+                <div>Welcome message must be at least 10 characters</div>
+                }
             </div>
+            }
         </div>
 
         <!-- Action Buttons -->
@@ -55,14 +67,18 @@
                 type="submit" 
                 [disabled]="settingsForm.invalid || isSaving"
                 class="px-6 py-3 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                <span *ngIf="!isSaving">Save Changes</span>
-                <span *ngIf="isSaving" class="flex items-center gap-2">
+                @if (!isSaving) {
+                <span>Save Changes</span>
+                }
+                @if (isSaving) {
+                <span class="flex items-center gap-2">
                     <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Saving...
                 </span>
+                }
             </button>
             
             <button 
